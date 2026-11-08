@@ -96,3 +96,4 @@ export const StoreSettingsProvider: React.FC<{ children: React.ReactNode }> = ({
 };
 
 export const useStoreSettings = () => useContext(StoreSettingsContext);
+

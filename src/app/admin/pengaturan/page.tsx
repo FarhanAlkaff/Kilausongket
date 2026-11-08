@@ -14,8 +14,10 @@ import {
   CheckCircle2,
   AlertCircle
 } from "lucide-react";
+import { useStoreSettings } from "@/context/StoreSettingsContext";
 
 export default function AdminSettingsPage() {
+  const { refreshSettings } = useStoreSettings();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
@@ -75,6 +77,7 @@ export default function AdminSettingsPage() {
       });
       const data = await res.json();
       if (data.success) {
+        await refreshSettings();
         setSuccessMessage("Pengaturan toko dan kontak berhasil disimpan!");
         setTimeout(() => setSuccessMessage(""), 4000);
       } else {
