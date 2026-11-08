@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { StoreSettingsProvider } from "@/context/StoreSettingsContext";
 
 export const metadata: Metadata = {
   title: "Kilau Songket | Busana Songket Premium Anak & Dewasa",
@@ -35,7 +36,9 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased min-h-screen flex flex-col selection:bg-gold/30 selection:text-forest-dark font-sans bg-ivory-warm text-charcoal">
-        {children}
+        <StoreSettingsProvider>
+          {children}
+        </StoreSettingsProvider>
       </body>
     </html>
   );

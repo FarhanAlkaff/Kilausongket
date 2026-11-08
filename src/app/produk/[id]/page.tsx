@@ -22,9 +22,11 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import SizeGuideModal from "@/components/SizeGuideModal";
-import { PRODUCTS, Product, formatRupiah, getWhatsAppProductUrl, STORE_INFO } from "@/data/products";
+import { PRODUCTS, Product, formatRupiah, STORE_INFO } from "@/data/products";
+import { useStoreSettings } from "@/context/StoreSettingsContext";
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { settings, getWhatsAppProductUrl } = useStoreSettings();
   const resolvedParams = use(params);
   const staticProduct = PRODUCTS.find((p) => p.id === resolvedParams.id);
 
@@ -257,9 +259,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   <span>Pesan Sekarang via WhatsApp</span>
                 </a>
 
-                {product.shopeeUrl && (
+                {(product.shopeeUrl || settings.shopeeUrl) && (
                   <a
-                    href={product.shopeeUrl}
+                    href={product.shopeeUrl || settings.shopeeUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-[#EE4D2D]/10 hover:bg-[#EE4D2D]/15 text-[#EE4D2D] font-bold text-sm rounded-2xl border border-[#EE4D2D]/30 transition"

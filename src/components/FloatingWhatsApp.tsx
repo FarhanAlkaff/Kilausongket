@@ -3,8 +3,11 @@
 import React, { useState } from "react";
 import { MessageCircle, X, Sparkles, Send, PhoneCall } from "lucide-react";
 import { STORE_INFO } from "@/data/products";
+import { useStoreSettings } from "@/context/StoreSettingsContext";
 
 export const FloatingWhatsApp: React.FC = () => {
+  const { settings } = useStoreSettings();
+  const whatsappNum = settings.whatsappNumber || STORE_INFO.whatsappNumber;
   const [isOpen, setIsOpen] = useState(false);
 
   const quickTopics = [
@@ -57,7 +60,7 @@ export const FloatingWhatsApp: React.FC = () => {
               {quickTopics.map((topic, i) => (
                 <a
                   key={i}
-                  href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=${encodeURIComponent(topic.text)}`}
+                  href={`https://wa.me/${whatsappNum}?text=${encodeURIComponent(topic.text)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block p-2 rounded-xl bg-white hover:bg-forest/5 border border-stone-200 hover:border-gold/60 text-stone-700 hover:text-forest-dark font-medium transition-all text-[11px] flex items-center justify-between group"
@@ -72,7 +75,7 @@ export const FloatingWhatsApp: React.FC = () => {
           {/* Direct CTA */}
           <div className="p-3 bg-white border-t border-stone-100">
             <a
-              href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20konsultasi`}
+              href={`https://wa.me/${whatsappNum}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20konsultasi`}
               target="_blank"
               rel="noopener noreferrer"
               className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md"

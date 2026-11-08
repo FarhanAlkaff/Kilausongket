@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import BrandLogo from "./BrandLogo";
 import { STORE_INFO } from "@/data/products";
+import { useStoreSettings } from "@/context/StoreSettingsContext";
 
 interface FooterProps {
   onOpenSizeGuide?: () => void;
@@ -22,6 +23,14 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ onOpenSizeGuide, onSelectCategory }) => {
+  const { settings } = useStoreSettings();
+  const whatsappNum = settings.whatsappNumber || STORE_INFO.whatsappNumber;
+  const whatsappDisp = settings.whatsappDisplay || STORE_INFO.whatsappDisplay;
+  const shopeeLink = settings.shopeeUrl || STORE_INFO.shopeeUrl;
+  const igLink = settings.instagramUrl || STORE_INFO.instagramUrl;
+  const addr = settings.address || STORE_INFO.address;
+  const hours = settings.operationalHours || STORE_INFO.operationalHours;
+  const mail = settings.email || STORE_INFO.email;
   return (
     <footer className="bg-forest-dark text-ivory pt-16 pb-10 border-t border-gold/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,7 +48,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenSizeGuide, onSelectCategor
 
             <div className="pt-2 flex items-center gap-3">
               <a
-                href={STORE_INFO.shopeeUrl}
+                href={shopeeLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-xl bg-white/10 hover:bg-[#EE4D2D] hover:text-white flex items-center justify-center transition-colors text-ivory border border-white/10"
@@ -49,7 +58,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenSizeGuide, onSelectCategor
               </a>
 
               <a
-                href={`https://wa.me/${STORE_INFO.whatsappNumber}`}
+                href={`https://wa.me/${whatsappNum}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-xl bg-white/10 hover:bg-emerald-600 hover:text-white flex items-center justify-center transition-colors text-ivory border border-white/10"
@@ -59,7 +68,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenSizeGuide, onSelectCategor
               </a>
 
               <a
-                href={STORE_INFO.instagramUrl}
+                href={igLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-9 h-9 rounded-xl bg-white/10 hover:bg-pink-600 hover:text-white flex items-center justify-center transition-colors text-ivory border border-white/10"
@@ -157,7 +166,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenSizeGuide, onSelectCategor
               </li>
               <li>
                 <a 
-                  href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20tanya%20prosedur%20tukar%20ukuran`} 
+                  href={`https://wa.me/${whatsappNum}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20tanya%20prosedur%20tukar%20ukuran`} 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="hover:text-gold transition-colors block"
@@ -176,19 +185,19 @@ export const Footer: React.FC<FooterProps> = ({ onOpenSizeGuide, onSelectCategor
             <div className="space-y-2.5 text-xs text-ivory/80">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-gold-light flex-shrink-0 mt-0.5" />
-                <span>{STORE_INFO.address}</span>
+                <span>{addr}</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Clock className="w-4 h-4 text-gold-light flex-shrink-0" />
-                <span>{STORE_INFO.operationalHours}</span>
+                <span>{hours}</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <PhoneCall className="w-4 h-4 text-gold-light flex-shrink-0" />
-                <span>WhatsApp: {STORE_INFO.whatsappDisplay}</span>
+                <span>WhatsApp: {whatsappDisp}</span>
               </div>
               <div className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-gold-light flex-shrink-0" />
-                <span>{STORE_INFO.email}</span>
+                <span>{mail}</span>
               </div>
             </div>
 

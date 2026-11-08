@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { X, Ruler, MessageCircle, HelpCircle } from "lucide-react";
 import { STORE_INFO } from "@/data/products";
+import { useStoreSettings } from "@/context/StoreSettingsContext";
 
 interface SizeGuideModalProps {
   isOpen: boolean;
@@ -10,6 +11,8 @@ interface SizeGuideModalProps {
 }
 
 export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose }) => {
+  const { settings } = useStoreSettings();
+  const whatsappNum = settings.whatsappNumber || STORE_INFO.whatsappNumber;
   const [activeTab, setActiveTab] = useState<"anak" | "dewasa-wanita" | "dewasa-pria">("anak");
 
   if (!isOpen) return null;
@@ -240,7 +243,7 @@ export const SizeGuideModal: React.FC<SizeGuideModalProps> = ({ isOpen, onClose 
           </div>
 
           <a
-            href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20konsultasi%20panduan%20ukuran%20baju%20songket`}
+            href={`https://wa.me/${whatsappNum}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20konsultasi%20panduan%20ukuran%20baju%20songket`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-forest hover:bg-forest-light transition-all"

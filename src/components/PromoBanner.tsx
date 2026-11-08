@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { MessageCircle, ShoppingBag, Gift, Clock } from "lucide-react";
 import { STORE_INFO } from "@/data/products";
 import { ScaleIn } from "@/components/ui/motion-wrapper";
+import { useStoreSettings } from "@/context/StoreSettingsContext";
 
 interface PromoBannerProps {
   promoTitle?: string;
@@ -15,6 +16,11 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({
   promoTitle,
   promoSubtitle,
 }) => {
+  const { settings } = useStoreSettings();
+  const whatsappNum = settings.whatsappNumber || STORE_INFO.whatsappNumber;
+  const shopeeLink = settings.shopeeUrl || STORE_INFO.shopeeUrl;
+  const finalTitle = promoTitle || settings.promoTitle || "Rencanakan Momen Bersejarah Keluarga dengan Kemilau Songket Mewah";
+  const finalSubtitle = promoSubtitle || settings.promoSubtitle;
   return (
     <section className="py-12 sm:py-16 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -39,11 +45,11 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({
                 </div>
 
                 <h2 className="font-serif text-2xl sm:text-4xl font-bold text-ivory leading-snug">
-                  {promoTitle || "Rencanakan Momen Bersejarah Keluarga dengan Kemilau Songket Mewah"}
+                  {finalTitle}
                 </h2>
 
                 <p className="text-sm sm:text-base text-ivory/80 max-w-2xl leading-relaxed">
-                  {promoSubtitle || (
+                  {finalSubtitle || (
                     <>
                       Dapatkan <strong>diskon khusus untuk pesanan Sarimbit Keluarga (3 pcs atau lebih)</strong> serta gratis konsultasi ukuran custom. Pesan sekarang melalui WhatsApp untuk persiapan lebih awal!
                     </>
@@ -64,7 +70,7 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({
               {/* CTAs */}
               <div className="lg:col-span-4 flex flex-col sm:flex-row lg:flex-col gap-3 justify-center">
                 <a
-                  href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=Halo%20Kilau%20Songket,%20saya%20tertarik%20dengan%20promo%20sarimbit%20keluarga%20/%20pesanan%20khusus`}
+                  href={`https://wa.me/${whatsappNum}?text=Halo%20Kilau%20Songket,%20saya%20tertarik%20dengan%20promo%20sarimbit%20keluarga%20/%20pesanan%20khusus`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-bold text-forest-dark bg-gold hover:bg-gold-light transition-all shadow-lg hover:shadow-goldGlow hover:scale-[1.02]"
@@ -74,7 +80,7 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({
                 </a>
 
                 <a
-                  href={STORE_INFO.shopeeUrl}
+                  href={shopeeLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all hover:scale-[1.02]"

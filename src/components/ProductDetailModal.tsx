@@ -15,7 +15,8 @@ import {
   RotateCcw,
   ExternalLink
 } from "lucide-react";
-import { Product, formatRupiah, getWhatsAppProductUrl, STORE_INFO } from "@/data/products";
+import { Product, formatRupiah, STORE_INFO } from "@/data/products";
+import { useStoreSettings } from "@/context/StoreSettingsContext";
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -28,6 +29,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onClose,
   onOpenSizeGuide,
 }) => {
+  const { settings, getWhatsAppProductUrl } = useStoreSettings();
   if (!product) return null;
 
   const [selectedImage, setSelectedImage] = useState(product.images[0]);
@@ -35,6 +37,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const [selectedColor, setSelectedColor] = useState(product.colors[0] || "");
 
   const dynamicWaUrl = getWhatsAppProductUrl(product.name, `${selectedSize} - Warna: ${selectedColor}`);
+  const shopeeLink = product.shopeeUrl || settings.shopeeUrl || STORE_INFO.shopeeUrl;
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
@@ -258,7 +261,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
                 {/* Shopee Buy Button */}
                 <a
-                  href={product.shopeeUrl}
+                  href={shopeeLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-sm font-bold text-[#EE4D2D] bg-[#EE4D2D]/10 hover:bg-[#EE4D2D]/20 border border-[#EE4D2D]/40 transition-all"

@@ -5,12 +5,15 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, HelpCircle, MessageCircle } from "lucide-react";
 import { FAQS, STORE_INFO } from "@/data/products";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
+import { useStoreSettings } from "@/context/StoreSettingsContext";
 
 interface FAQSectionProps {
   faqs?: typeof FAQS;
 }
 
 export const FAQSection: React.FC<FAQSectionProps> = ({ faqs = FAQS }) => {
+  const { settings } = useStoreSettings();
+  const whatsappNum = settings.whatsappNumber || STORE_INFO.whatsappNumber;
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggleAccordion = (index: number) => {
@@ -95,7 +98,7 @@ export const FAQSection: React.FC<FAQSectionProps> = ({ faqs = FAQS }) => {
           </div>
 
           <a
-            href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20bertanya%20mengenai%20produk`}
+            href={`https://wa.me/${whatsappNum}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20bertanya%20mengenai%20produk`}
             target="_blank"
             rel="noopener noreferrer"
             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-forest hover:bg-forest-light transition-all hover:scale-105"

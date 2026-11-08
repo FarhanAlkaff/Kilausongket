@@ -13,6 +13,7 @@ import {
 import BrandLogo from "./BrandLogo";
 import NavHeader from "@/components/ui/nav-header";
 import { STORE_INFO } from "@/data/products";
+import { useStoreSettings } from "@/context/StoreSettingsContext";
 
 interface NavbarProps {
   onOpenSizeGuide?: () => void;
@@ -20,6 +21,10 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ onOpenSizeGuide, onSelectCategory }) => {
+  const { settings } = useStoreSettings();
+  const whatsappNum = settings.whatsappNumber || STORE_INFO.whatsappNumber;
+  const shopeeLink = settings.shopeeUrl || STORE_INFO.shopeeUrl;
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -99,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSizeGuide, onSelectCategor
           <div className="hidden sm:flex items-center gap-2.5 flex-shrink-0">
             {/* Shopee Button */}
             <a
-              href={STORE_INFO.shopeeUrl}
+              href={shopeeLink}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-[#EE4D2D] bg-[#EE4D2D]/10 hover:bg-[#EE4D2D]/15 border border-[#EE4D2D]/25 rounded-full transition-all shadow-sm"
@@ -111,7 +116,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSizeGuide, onSelectCategor
 
             {/* WhatsApp CTA */}
             <a
-              href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20konsultasi%20katalog%20dan%20pemesanan`}
+              href={`https://wa.me/${whatsappNum}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20konsultasi%20katalog%20dan%20pemesanan`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-forest hover:bg-forest-light rounded-full transition-all shadow-sm border border-gold/30"
@@ -124,7 +129,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSizeGuide, onSelectCategor
           {/* Mobile Menu Button */}
           <div className="flex items-center gap-2 lg:hidden">
             <a
-              href={`https://wa.me/${STORE_INFO.whatsappNumber}`}
+              href={`https://wa.me/${whatsappNum}`}
               target="_blank"
               rel="noopener noreferrer"
               className="p-2 text-forest-dark bg-gold/20 rounded-full"
@@ -220,7 +225,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSizeGuide, onSelectCategor
 
           <div className="pt-4 flex flex-col gap-2.5">
             <a
-              href={STORE_INFO.shopeeUrl}
+              href={shopeeLink}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold text-[#EE4D2D] bg-[#EE4D2D]/10 border border-[#EE4D2D]/30 rounded-xl"
@@ -230,7 +235,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSizeGuide, onSelectCategor
             </a>
 
             <a
-              href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20konsultasi%20katalog`}
+              href={`https://wa.me/${whatsappNum}?text=Halo%20Kilau%20Songket,%20saya%20ingin%20konsultasi%20katalog`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold text-white bg-forest hover:bg-forest-light rounded-xl shadow-md"

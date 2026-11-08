@@ -13,12 +13,16 @@ import {
   CheckCircle2
 } from "lucide-react";
 import { STORE_INFO } from "@/data/products";
+import { useStoreSettings } from "@/context/StoreSettingsContext";
 
 interface HeroProps {
   onExploreClick: () => void;
 }
 
 export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
+  const { settings } = useStoreSettings();
+  const whatsappNum = settings.whatsappNumber || STORE_INFO.whatsappNumber;
+  const shopeeLink = settings.shopeeUrl || STORE_INFO.shopeeUrl;
   return (
     <section id="beranda" className="relative overflow-hidden bg-ivory-warm pt-6 pb-16 lg:pt-12 lg:pb-24 border-b border-gold/15">
       {/* Decorative Background Elements */}
@@ -94,7 +98,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
               </button>
 
               <a
-                href={`https://wa.me/${STORE_INFO.whatsappNumber}?text=Halo%20Kilau%20Songket,%20saya%20tertarik%20dengan%20koleksi%20songket%20anak%20dan%20dewasa.%20Boleh%20minta%20info%20katalog%20lengkap?`}
+                href={`https://wa.me/${whatsappNum}?text=Halo%20Kilau%20Songket,%20saya%20tertarik%20dengan%20koleksi%20songket%20anak%20dan%20dewasa.%20Boleh%20minta%20info%20katalog%20lengkap?`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm sm:text-base font-semibold text-forest-dark bg-white hover:bg-ivory border border-gold/50 rounded-full shadow-sm hover:border-gold transition-all hover:scale-[1.02]"
@@ -104,7 +108,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
               </a>
 
               <a
-                href={STORE_INFO.shopeeUrl}
+                href={shopeeLink}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm sm:text-base font-semibold text-[#EE4D2D] bg-[#EE4D2D]/10 hover:bg-[#EE4D2D]/20 border border-[#EE4D2D]/30 rounded-full transition-all hover:scale-[1.02]"
