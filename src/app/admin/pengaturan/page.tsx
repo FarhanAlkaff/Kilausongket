@@ -15,6 +15,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { useStoreSettings } from "@/context/StoreSettingsContext";
+import ShopeeIcon from "@/components/ShopeeIcon";
 
 export default function AdminSettingsPage() {
   const { refreshSettings } = useStoreSettings();
@@ -183,7 +184,9 @@ export default function AdminSettingsPage() {
                 Link Toko Utama Shopee *
               </label>
               <div className="relative">
-                <ShoppingBag className="w-4 h-4 text-[#EE4D2D] absolute left-3 top-1/2 -translate-y-1/2" />
+                <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                  <ShopeeIcon className="w-4 h-4" />
+                </div>
                 <input
                   type="url"
                   name="shopeeUrl"

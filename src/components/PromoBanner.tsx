@@ -6,6 +6,7 @@ import { MessageCircle, ShoppingBag, Gift, Clock } from "lucide-react";
 import { STORE_INFO } from "@/data/products";
 import { ScaleIn } from "@/components/ui/motion-wrapper";
 import { useStoreSettings } from "@/context/StoreSettingsContext";
+import ShopeeIcon from "./ShopeeIcon";
 
 interface PromoBannerProps {
   promoTitle?: string;
@@ -85,7 +86,7 @@ export const PromoBanner: React.FC<PromoBannerProps> = ({
                   rel="noopener noreferrer"
                   className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl text-sm font-semibold text-white bg-white/10 hover:bg-white/20 border border-white/20 transition-all hover:scale-[1.02]"
                 >
-                  <ShoppingBag className="w-4 h-4 text-[#EE4D2D]" />
+                  <ShopeeIcon className="w-4 h-4" />
                   <span>Lihat Toko di Shopee</span>
                 </a>
               </div>

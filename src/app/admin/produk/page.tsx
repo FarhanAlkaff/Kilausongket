@@ -17,6 +17,7 @@ import {
   Sparkles,
   AlertCircle
 } from "lucide-react";
+import ShopeeIcon from "@/components/ShopeeIcon";
 
 interface Product {
   id: string;
@@ -743,7 +744,9 @@ export default function AdminProductPage() {
                   Link Produk Shopee
                 </label>
                 <div className="relative">
-                  <ShoppingBag className="w-4 h-4 text-[#EE4D2D] absolute left-3 top-1/2 -translate-y-1/2" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                    <ShopeeIcon className="w-4 h-4" />
+                  </div>
                   <input
                     type="url"
                     value={formShopeeUrl}

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Product, PRODUCTS, CATEGORIES, formatRupiah, getWhatsAppProductUrl } from "@/data/products";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
+import ShopeeIcon from "./ShopeeIcon";
 
 interface ProductCatalogProps {
   selectedCategory: string;
@@ -361,10 +362,10 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
                             href={product.shopeeUrl}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-1 py-2 px-2 rounded-xl text-xs font-semibold text-[#EE4D2D] bg-[#EE4D2D]/10 hover:bg-[#EE4D2D]/20 border border-[#EE4D2D]/30 transition-all"
+                            className="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-xl text-xs font-semibold text-[#EE4D2D] bg-[#EE4D2D]/10 hover:bg-[#EE4D2D]/20 border border-[#EE4D2D]/30 transition-all"
                             title="Beli via Shopee"
                           >
-                            <ShoppingBag className="w-3.5 h-3.5" />
+                            <ShopeeIcon className="w-3.5 h-3.5" />
                             <span>Shopee</span>
                           </a>
                         </div>

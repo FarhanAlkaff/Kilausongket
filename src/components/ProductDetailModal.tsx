@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { Product, formatRupiah, STORE_INFO } from "@/data/products";
 import { useStoreSettings } from "@/context/StoreSettingsContext";
+import ShopeeIcon from "./ShopeeIcon";
 
 interface ProductDetailModalProps {
   product: Product | null;
@@ -266,7 +267,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                   rel="noopener noreferrer"
                   className="flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl text-sm font-bold text-[#EE4D2D] bg-[#EE4D2D]/10 hover:bg-[#EE4D2D]/20 border border-[#EE4D2D]/40 transition-all"
                 >
-                  <ShoppingBag className="w-4 h-4" />
+                  <ShopeeIcon className="w-4 h-4" />
                   <span>Beli di Shopee</span>
                   <ExternalLink className="w-3.5 h-3.5 opacity-70" />
                 </a>

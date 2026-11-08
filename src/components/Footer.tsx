@@ -14,6 +14,7 @@ import {
   Heart 
 } from "lucide-react";
 import BrandLogo from "./BrandLogo";
+import ShopeeIcon from "./ShopeeIcon";
 import { STORE_INFO } from "@/data/products";
 import { useStoreSettings } from "@/context/StoreSettingsContext";
 
@@ -54,7 +55,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenSizeGuide, onSelectCategor
                 className="w-9 h-9 rounded-xl bg-white/10 hover:bg-[#EE4D2D] hover:text-white flex items-center justify-center transition-colors text-ivory border border-white/10"
                 aria-label="Shopee Kilau Songket"
               >
-                <ShoppingBag className="w-4 h-4" />
+                <ShopeeIcon className="w-4 h-4" />
               </a>
 
               <a

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { STORE_INFO } from "@/data/products";
 import { useStoreSettings } from "@/context/StoreSettingsContext";
+import ShopeeIcon from "./ShopeeIcon";
 
 interface HeroProps {
   onExploreClick: () => void;
@@ -113,7 +114,7 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
                 rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 text-sm sm:text-base font-semibold text-[#EE4D2D] bg-[#EE4D2D]/10 hover:bg-[#EE4D2D]/20 border border-[#EE4D2D]/30 rounded-full transition-all hover:scale-[1.02]"
               >
-                <ShoppingBag className="w-4 h-4" />
+                <ShopeeIcon className="w-4 h-4" />
                 <span>Beli di Shopee</span>
               </a>
             </div>

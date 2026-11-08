@@ -11,6 +11,7 @@ import {
   Ruler
 } from "lucide-react";
 import BrandLogo from "./BrandLogo";
+import ShopeeIcon from "./ShopeeIcon";
 import NavHeader from "@/components/ui/nav-header";
 import { STORE_INFO } from "@/data/products";
 import { useStoreSettings } from "@/context/StoreSettingsContext";
@@ -110,7 +111,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSizeGuide, onSelectCategor
               className="flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-[#EE4D2D] bg-[#EE4D2D]/10 hover:bg-[#EE4D2D]/15 border border-[#EE4D2D]/25 rounded-full transition-all shadow-sm"
               title="Kunjungi Toko Shopee"
             >
-              <ShoppingBag className="w-3.5 h-3.5" />
+              <ShopeeIcon className="w-3.5 h-3.5" />
               <span>Shopee</span>
             </a>
 
@@ -230,7 +231,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSizeGuide, onSelectCategor
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 w-full py-2.5 text-xs font-bold text-[#EE4D2D] bg-[#EE4D2D]/10 border border-[#EE4D2D]/30 rounded-xl"
             >
-              <ShoppingBag className="w-4 h-4" />
+              <ShopeeIcon className="w-4 h-4" />
               <span>Kunjungi Toko Shopee</span>
             </a>
 
