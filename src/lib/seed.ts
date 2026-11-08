@@ -34,8 +34,8 @@ export function seedDatabase() {
       "halo@kilausongket.com",
       "Senin - Minggu: 08.00 - 21.00 WIB",
       "Sentra Tenun & Butik Kilau Songket, Jl. Kebangsaan No. 88, Indonesia",
-      "Busana Songket Premium untuk Si Kecil & Keluarga",
-      "Koleksi setelan songket anak & dewasa dengan furing katun anti-gatal. Tenunan benang emas presisi, desain modern elegan.",
+      "Keanggunan Warisan Songket untuk Seluruh Generasi",
+      "Koleksi setelan songket premium untuk anak-anak dan dewasa dengan furing katun lembut anti-gatal. Dibuat dengan benang emas berkualitas tinggi.",
       "Kilau Songket lahir dari kecintaan mendalam terhadap warisan tenun songket nusantara. Kami percaya setiap helai benang emas yang terjalin menyimpan cerita keagungan budaya yang patut dilestarikan."
     );
   }

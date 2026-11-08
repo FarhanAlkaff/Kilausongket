@@ -82,11 +82,7 @@ export default function Home() {
       />
 
       {/* Hero Section */}
-      <Hero
-        onExploreClick={handleExploreClick}
-        heroTitle={storeSettings?.heroTitle}
-        heroSubtitle={storeSettings?.heroSubtitle}
-      />
+      <Hero onExploreClick={handleExploreClick} />
 
       {/* Category Highlights */}
       <Categories

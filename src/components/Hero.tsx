@@ -16,15 +16,9 @@ import { STORE_INFO } from "@/data/products";
 
 interface HeroProps {
   onExploreClick: () => void;
-  heroTitle?: string;
-  heroSubtitle?: string;
 }
 
-export const Hero: React.FC<HeroProps> = ({
-  onExploreClick,
-  heroTitle,
-  heroSubtitle,
-}) => {
+export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
   return (
     <section id="beranda" className="relative overflow-hidden bg-ivory-warm pt-6 pb-16 lg:pt-12 lg:pb-24 border-b border-gold/15">
       {/* Decorative Background Elements */}
@@ -52,33 +46,21 @@ export const Hero: React.FC<HeroProps> = ({
               <span>Digital Storefront & Eksklusif Songket Indonesia</span>
             </motion.div>
 
-            {/* Main Headline */}
-            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-medium text-forest-dark tracking-tight leading-[1.12]">
-              {heroTitle ? (
-                heroTitle
-              ) : (
-                <>
-                  Keanggunan Warisan{" "}
-                  <span className="text-gold-gradient italic relative inline-block font-serif font-semibold">
-                    Songket
-                    <svg className="absolute -bottom-1 left-0 w-full h-2 text-gold/40" viewBox="0 0 100 10" preserveAspectRatio="none">
-                      <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" />
-                    </svg>
-                  </span>{" "}
-                  untuk Seluruh Generasi
-                </>
-              )}
+            {/* Main Headline - Restored exactly to original Image 2 */}
+            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-forest-dark tracking-tight leading-[1.15]">
+              Keanggunan Warisan{" "}
+              <span className="text-gold-gradient relative inline-block">
+                Songket
+                <svg className="absolute -bottom-1 left-0 w-full h-2 text-gold/40" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" />
+                </svg>
+              </span>{" "}
+              untuk Seluruh Generasi
             </h1>
 
             {/* Description */}
             <p className="text-base sm:text-lg text-charcoal-light max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              {heroSubtitle ? (
-                heroSubtitle
-              ) : (
-                <>
-                  Koleksi setelan songket premium untuk <strong className="text-forest font-semibold">anak-anak</strong> dan <strong className="text-forest font-semibold">dewasa</strong>. Dibuat dengan benang emas berkualitas tinggi dan <span className="bg-gold/15 px-1.5 py-0.5 rounded text-forest-dark font-medium">furing katun lembut anti-gatal</span> agar si kecil dan keluarga nyaman tampil memukau di momen istimewa.
-                </>
-              )}
+              Koleksi setelan songket premium untuk <strong className="text-forest font-semibold">anak-anak</strong> dan <strong className="text-forest font-semibold">dewasa</strong>. Dibuat dengan benang emas berkualitas tinggi dan <span className="bg-gold/15 px-1.5 py-0.5 rounded text-forest-dark font-medium">furing katun lembut anti-gatal</span> agar si kecil dan keluarga nyaman tampil memukau di momen istimewa.
             </p>
 
             {/* Key Value Bullets */}
@@ -140,8 +122,8 @@ export const Hero: React.FC<HeroProps> = ({
               </div>
               <div className="h-8 w-px bg-stone-300 hidden sm:block" />
               <div>
-                <div className="flex items-center gap-1">
-                  <span className="text-2xl font-serif font-bold text-forest-dark">4.9</span>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-2xl font-serif font-bold text-forest-dark">4.9</p>
                   <div className="flex text-amber-500">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="w-3.5 h-3.5 fill-current" />
