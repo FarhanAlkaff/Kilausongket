@@ -32,8 +32,10 @@ module.exports = {
         },
       },
       fontFamily: {
-        serif: ["'Playfair Display'", "ui-serif", "Georgia", "Cambria", "'Times New Roman'", "serif"],
-        sans: ["'Plus Jakarta Sans'", "system-ui", "-apple-system", "BlinkMacSystemFont", "sans-serif"],
+        serif: ["'Cormorant Garamond'", "Georgia", "Cambria", "'Times New Roman'", "serif"],
+        display: ["'Cormorant Garamond'", "Georgia", "serif"],
+        sans: ["'Outfit'", "'Plus Jakarta Sans'", "system-ui", "-apple-system", "sans-serif"],
+        body: ["'Plus Jakarta Sans'", "'Outfit'", "sans-serif"],
       },
       boxShadow: {
         luxury: "0 10px 40px -10px rgba(38, 59, 50, 0.15)",

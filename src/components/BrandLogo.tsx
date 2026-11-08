@@ -15,9 +15,9 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   showText = true,
 }) => {
   const sizeMap = {
-    sm: { img: 36, textTitle: "text-base tracking-widest", textSub: "text-[9px] tracking-[0.25em]" },
-    md: { img: 48, textTitle: "text-lg tracking-widest", textSub: "text-[10px] tracking-[0.28em]" },
-    lg: { img: 64, textTitle: "text-2xl tracking-widest", textSub: "text-xs tracking-[0.32em]" },
+    sm: { img: 36, textTitle: "text-base tracking-[0.16em]", textSub: "text-[9px] tracking-[0.32em]" },
+    md: { img: 46, textTitle: "text-lg tracking-[0.18em]", textSub: "text-[10px] tracking-[0.34em]" },
+    lg: { img: 60, textTitle: "text-2xl tracking-[0.2em]", textSub: "text-xs tracking-[0.36em]" },
   };
 
   const currentSize = sizeMap[size];
@@ -43,11 +43,11 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
         />
       </div>
 
-      {/* Typography */}
+      {/* Typography matching official logo style */}
       {showText && (
         <div className="flex flex-col">
           <span 
-            className={`font-serif font-black tracking-widest uppercase leading-tight ${
+            className={`font-sans font-black uppercase leading-tight ${
               variant === "light" 
                 ? "text-ivory" 
                 : "text-forest-dark"
@@ -62,7 +62,7 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
                 : "text-gold-dark"
             } ${currentSize.textSub}`}
           >
-            S O N G K E T
+            SONGKET
           </span>
         </div>
       )}
@@ -71,4 +71,3 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
 };
 
 export default BrandLogo;
-

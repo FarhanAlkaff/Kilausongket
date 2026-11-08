@@ -30,11 +30,11 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link 
-          href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" 
+          href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" 
           rel="stylesheet" 
         />
       </head>
-      <body className="antialiased min-h-screen flex flex-col selection:bg-gold/30 selection:text-forest-dark font-sans">
+      <body className="antialiased min-h-screen flex flex-col selection:bg-gold/30 selection:text-forest-dark font-sans bg-ivory-warm text-charcoal">
         {children}
       </body>
     </html>

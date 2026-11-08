@@ -47,9 +47,9 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
             </motion.div>
 
             {/* Main Headline */}
-            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-forest-dark tracking-tight leading-[1.15]">
+            <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-medium text-forest-dark tracking-tight leading-[1.12]">
               Keanggunan Warisan{" "}
-              <span className="text-gold-gradient relative inline-block">
+              <span className="text-gold-gradient italic relative inline-block font-serif font-semibold">
                 Songket
                 <svg className="absolute -bottom-1 left-0 w-full h-2 text-gold/40" viewBox="0 0 100 10" preserveAspectRatio="none">
                   <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" />

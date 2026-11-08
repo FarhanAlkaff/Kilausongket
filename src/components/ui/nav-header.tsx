@@ -26,18 +26,18 @@ export function NavHeader({ items, className = "" }: NavHeaderProps) {
   });
 
   const defaultItems: NavItem[] = [
-    { label: "Home", href: "#beranda" },
-    { label: "Pricing", href: "#katalog" },
-    { label: "About", href: "#tentang" },
-    { label: "Services", href: "#keunggulan" },
-    { label: "Contact", href: "#kontak" },
+    { label: "Beranda", href: "#beranda" },
+    { label: "Katalog", href: "#katalog" },
+    { label: "Keunggulan", href: "#keunggulan" },
+    { label: "Testimoni", href: "#testimoni" },
+    { label: "Tentang", href: "#tentang" },
   ];
 
   const navItems: NavItem[] = items || defaultItems;
 
   return (
     <ul
-      className={`relative mx-auto flex w-fit items-center rounded-full border border-forest/20 bg-white/95 p-1 shadow-sm backdrop-blur-md ${className}`}
+      className={`relative mx-auto flex w-fit items-center rounded-full border border-stone-200/80 bg-white/95 p-1 shadow-sm backdrop-blur-md ${className}`}
       onMouseLeave={() => setPosition((pv) => ({ ...pv, opacity: 0 }))}
     >
       {navItems.map((item, index) => (
@@ -82,7 +82,7 @@ const Tab = ({
           left: ref.current.offsetLeft,
         });
       }}
-      className="relative z-10 block cursor-pointer px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-charcoal transition-colors hover:text-white md:px-4 md:py-1.5 md:text-xs"
+      className="relative z-10 block cursor-pointer px-3.5 py-1.5 text-[13px] font-medium text-stone-700 transition-colors hover:text-white"
     >
       {href ? (
         <a href={href} onClick={handleClick} className="block whitespace-nowrap">
@@ -102,7 +102,7 @@ const Cursor = ({ position }: { position: { left: number; width: number; opacity
     <motion.li
       animate={position}
       transition={{ type: "spring", stiffness: 450, damping: 32 }}
-      className="absolute z-0 h-7 md:h-7 rounded-full bg-forest text-white"
+      className="absolute z-0 h-7 rounded-full bg-forest text-white"
     />
   );
 };
