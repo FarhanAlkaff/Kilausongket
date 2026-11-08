@@ -6,7 +6,11 @@ import { Sparkles, Heart, Award, Shield } from "lucide-react";
 import BrandLogo from "./BrandLogo";
 import { FadeInLeft, FadeInRight, FadeIn } from "@/components/ui/motion-wrapper";
 
-export const AboutSection: React.FC = () => {
+interface AboutSectionProps {
+  aboutText?: string;
+}
+
+export const AboutSection: React.FC<AboutSectionProps> = ({ aboutText }) => {
   return (
     <section id="tentang" className="py-16 sm:py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,13 +55,21 @@ export const AboutSection: React.FC = () => {
               Melestarikan Pesona Tenun Nusantara dengan Kenyamanan Modern
             </h2>
 
-            <p className="text-sm sm:text-base text-charcoal-light leading-relaxed">
-              <strong>Kilau Songket</strong> lahir dari keinginan tulus menghadirkan busana tenun songket yang tidak hanya memukau dipandang, tetapi juga benar-benar nyaman dipakai oleh siapa saja — mulai dari bayi dan anak-anak hingga orang dewasa.
-            </p>
+            {aboutText ? (
+              <p className="text-sm sm:text-base text-charcoal-light leading-relaxed whitespace-pre-line">
+                {aboutText}
+              </p>
+            ) : (
+              <>
+                <p className="text-sm sm:text-base text-charcoal-light leading-relaxed">
+                  <strong>Kilau Songket</strong> lahir dari keinginan tulus menghadirkan busana tenun songket yang tidak hanya memukau dipandang, tetapi juga benar-benar nyaman dipakai oleh siapa saja — mulai dari bayi dan anak-anak hingga orang dewasa.
+                </p>
 
-            <p className="text-sm sm:text-base text-charcoal-light leading-relaxed">
-              Banyak orang tua enggan memakaikan kain songket pada si kecil karena teksturnya yang kaku dan menusuk kulit. Di Kilau Songket, kami memecahkan masalah ini dengan merancang <strong>konstruksi furing katun silky ganda</strong> yang ramah kulit sensitif, sehingga si kecil dapat tampil gagah dan anggun tanpa rasa gerah maupun gatal.
-            </p>
+                <p className="text-sm sm:text-base text-charcoal-light leading-relaxed">
+                  Banyak orang tua enggan memakaikan kain songket pada si kecil karena teksturnya yang kaku dan menusuk kulit. Di Kilau Songket, kami memecahkan masalah ini dengan merancang <strong>konstruksi furing katun silky ganda</strong> yang ramah kulit sensitif, sehingga si kecil dapat tampil gagah dan anggun tanpa rasa gerah maupun gatal.
+                </p>
+              </>
+            )}
 
             {/* 3 Pillars */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4 border-t border-stone-100">

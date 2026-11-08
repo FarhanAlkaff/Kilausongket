@@ -1,0 +1,97 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id        String   @id @default(cuid())
+  username  String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  category      String   // anak, dewasa, sarimbit
+  subCategory   String   // anak-laki, anak-perempuan, dewasa-wanita, dewasa-pria, sarimbit
+  categoryLabel String
+  price         Int
+  originalPrice Int?
+  images        String   // JSON array of image URLs
+  motif         String
+  material      String
+  furing        String
+  availableSizes String  // JSON array
+  colors        String   // JSON array
+  isFeatured    Boolean  @default(false)
+  isBestSeller  Boolean  @default(false)
+  isNew         Boolean  @default(false)
+  isActive      Boolean  @default(true)
+  rating        Float    @default(5.0)
+  soldCount     Int      @default(0)
+  description   String
+  specs         String   // JSON array of {label, value}
+  shopeeUrl     String   @default("")
+  sortOrder     Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Category {
+  id          String  @id @default(cuid())
+  slug        String  @unique
+  label       String
+  description String?
+  badge       String?
+  sortOrder   Int     @default(0)
+  isActive    Boolean @default(true)
+}
+
+model Testimonial {
+  id               String  @id @default(cuid())
+  name             String
+  city             String
+  role             String
+  event            String?
+  rating           Int     @default(5)
+  content          String
+  productPurchased String?
+  isActive         Boolean @default(true)
+  sortOrder        Int     @default(0)
+}
+
+model FAQ {
+  id        String  @id @default(cuid())
+  question  String
+  answer    String
+  isActive  Boolean @default(true)
+  sortOrder Int     @default(0)
+}
+
+model StoreSettings {
+  id               String @id @default("main")
+  name             String @default("Kilau Songket")
+  tagline          String @default("")
+  whatsappNumber   String @default("")
+  whatsappDisplay  String @default("")
+  shopeeUrl        String @default("")
+  instagramUrl     String @default("")
+  tiktokUrl        String @default("")
+  email            String @default("")
+  operationalHours String @default("")
+  address          String @default("")
+  promoTitle       String @default("")
+  promoSubtitle    String @default("")
+  heroTitle        String @default("")
+  heroSubtitle     String @default("")
+  aboutText        String @default("")
+}
+

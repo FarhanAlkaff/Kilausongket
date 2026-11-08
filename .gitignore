@@ -25,6 +25,24 @@ yarn-error.log*
 
 # local env files
 .env*.local
+.env
+
+# database
+*.db
+*.db-wal
+*.db-shm
+*.db-journal
+/prisma/*.db*
+
+# agent skills
+.agents/
+.claude/
+.cursor/
+.devin/
+
+# uploads
+/public/uploads/*
+!/public/uploads/.gitkeep
 
 # vercel
 .vercel

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Categories from "@/components/Categories";
@@ -14,12 +14,49 @@ import Footer from "@/components/Footer";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import SizeGuideModal from "@/components/SizeGuideModal";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
-import { Product } from "@/data/products";
+import { Product, PRODUCTS, CATEGORIES, TESTIMONIALS, FAQS, STORE_INFO } from "@/data/products";
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState<boolean>(false);
+
+  // Dynamic state loaded from SQLite Admin Database
+  const [products, setProducts] = useState<Product[]>(PRODUCTS);
+  const [categories, setCategories] = useState<any[]>(CATEGORIES);
+  const [testimonials, setTestimonials] = useState<any[]>(TESTIMONIALS);
+  const [faqs, setFaqs] = useState<any[]>(FAQS);
+  const [storeSettings, setStoreSettings] = useState<any>(STORE_INFO);
+
+  useEffect(() => {
+    async function fetchLandingData() {
+      try {
+        const res = await fetch("/api/public/landing");
+        const json = await res.json();
+        if (json.success && json.data) {
+          if (json.data.products?.length > 0) {
+            setProducts(json.data.products);
+          }
+          if (json.data.categories?.length > 0) {
+            setCategories(json.data.categories);
+          }
+          if (json.data.testimonials?.length > 0) {
+            setTestimonials(json.data.testimonials);
+          }
+          if (json.data.faqs?.length > 0) {
+            setFaqs(json.data.faqs);
+          }
+          if (json.data.storeInfo) {
+            setStoreSettings(json.data.storeInfo);
+          }
+        }
+      } catch (err) {
+        // Fallback to static data on network error
+        console.log("Using static data fallback");
+      }
+    }
+    fetchLandingData();
+  }, []);
 
   const handleSelectCategory = (categoryId: string) => {
     setSelectedCategory(categoryId);
@@ -45,7 +82,11 @@ export default function Home() {
       />
 
       {/* Hero Section */}
-      <Hero onExploreClick={handleExploreClick} />
+      <Hero
+        onExploreClick={handleExploreClick}
+        heroTitle={storeSettings?.heroTitle}
+        heroSubtitle={storeSettings?.heroSubtitle}
+      />
 
       {/* Category Highlights */}
       <Categories
@@ -58,22 +99,27 @@ export default function Home() {
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
         onViewProduct={(product) => setSelectedProduct(product)}
+        products={products}
+        categories={categories}
       />
 
       {/* Value Propositions / Keunggulan Toko */}
       <ValueProps />
 
       {/* Promotional Banner */}
-      <PromoBanner />
+      <PromoBanner
+        promoTitle={storeSettings?.promoTitle}
+        promoSubtitle={storeSettings?.promoSubtitle}
+      />
 
       {/* Customer Testimonials & Reviews */}
-      <Testimonials />
+      <Testimonials testimonials={testimonials} />
 
       {/* About Kilau Songket */}
-      <AboutSection />
+      <AboutSection aboutText={storeSettings?.aboutText} />
 
       {/* Frequently Asked Questions */}
-      <FAQSection />
+      <FAQSection faqs={faqs} />
 
       {/* Footer */}
       <Footer
@@ -98,4 +144,3 @@ export default function Home() {
     </main>
   );
 }
-

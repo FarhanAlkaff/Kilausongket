@@ -6,7 +6,15 @@ import { MessageCircle, ShoppingBag, Gift, Clock } from "lucide-react";
 import { STORE_INFO } from "@/data/products";
 import { ScaleIn } from "@/components/ui/motion-wrapper";
 
-export const PromoBanner: React.FC = () => {
+interface PromoBannerProps {
+  promoTitle?: string;
+  promoSubtitle?: string;
+}
+
+export const PromoBanner: React.FC<PromoBannerProps> = ({
+  promoTitle,
+  promoSubtitle,
+}) => {
   return (
     <section className="py-12 sm:py-16 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -31,11 +39,15 @@ export const PromoBanner: React.FC = () => {
                 </div>
 
                 <h2 className="font-serif text-2xl sm:text-4xl font-bold text-ivory leading-snug">
-                  Rencanakan Momen Bersejarah Keluarga dengan Kemilau Songket Mewah
+                  {promoTitle || "Rencanakan Momen Bersejarah Keluarga dengan Kemilau Songket Mewah"}
                 </h2>
 
                 <p className="text-sm sm:text-base text-ivory/80 max-w-2xl leading-relaxed">
-                  Dapatkan <strong>diskon khusus untuk pesanan Sarimbit Keluarga (3 pcs atau lebih)</strong> serta gratis konsultasi ukuran custom. Pesan sekarang melalui WhatsApp untuk persiapan lebih awal!
+                  {promoSubtitle || (
+                    <>
+                      Dapatkan <strong>diskon khusus untuk pesanan Sarimbit Keluarga (3 pcs atau lebih)</strong> serta gratis konsultasi ukuran custom. Pesan sekarang melalui WhatsApp untuk persiapan lebih awal!
+                    </>
+                  )}
                 </p>
 
                 <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2 text-xs text-gold-light">

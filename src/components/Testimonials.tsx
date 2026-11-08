@@ -6,7 +6,11 @@ import { Star, Quote, CheckCircle2 } from "lucide-react";
 import { TESTIMONIALS } from "@/data/products";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
 
-export const Testimonials: React.FC = () => {
+interface TestimonialsProps {
+  testimonials?: typeof TESTIMONIALS;
+}
+
+export const Testimonials: React.FC<TestimonialsProps> = ({ testimonials = TESTIMONIALS }) => {
   return (
     <section id="testimoni" className="py-16 sm:py-24 bg-ivory-warm border-b border-gold/15 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,7 +30,7 @@ export const Testimonials: React.FC = () => {
 
         {/* Testimonials Grid with Stagger Motion */}
         <StaggerContainer staggerDelay={0.15} className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {TESTIMONIALS.map((t) => (
+          {testimonials.map((t) => (
             <StaggerItem key={t.id}>
               <motion.div
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}

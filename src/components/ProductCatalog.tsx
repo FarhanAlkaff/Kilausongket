@@ -22,12 +22,16 @@ interface ProductCatalogProps {
   selectedCategory: string;
   onSelectCategory: (category: string) => void;
   onViewProduct: (product: Product) => void;
+  products?: Product[];
+  categories?: any[];
 }
 
 export const ProductCatalog: React.FC<ProductCatalogProps> = ({
   selectedCategory,
   onSelectCategory,
   onViewProduct,
+  products = PRODUCTS,
+  categories = CATEGORIES,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [subFilter, setSubFilter] = useState<string>("all");
@@ -35,7 +39,7 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
 
   // Filter logic
   const filteredProducts = useMemo(() => {
-    return PRODUCTS.filter((product) => {
+    return products.filter((product) => {
       // Category filter
       if (selectedCategory !== "all" && product.category !== selectedCategory) {
         return false;
@@ -89,7 +93,7 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
           {/* Top Row: Main Category Tabs */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-stone-200/80 pb-4">
             <div className="flex flex-wrap items-center gap-2">
-              {CATEGORIES.map((cat) => {
+              {categories.map((cat) => {
                 const isActive = selectedCategory === cat.id;
                 return (
                   <button

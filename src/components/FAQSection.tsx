@@ -6,7 +6,11 @@ import { ChevronDown, HelpCircle, MessageCircle } from "lucide-react";
 import { FAQS, STORE_INFO } from "@/data/products";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
 
-export const FAQSection: React.FC = () => {
+interface FAQSectionProps {
+  faqs?: typeof FAQS;
+}
+
+export const FAQSection: React.FC<FAQSectionProps> = ({ faqs = FAQS }) => {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   const toggleAccordion = (index: number) => {
@@ -32,7 +36,7 @@ export const FAQSection: React.FC = () => {
 
         {/* Accordion List with Motion */}
         <StaggerContainer staggerDelay={0.08} className="space-y-3.5">
-          {FAQS.map((faq, idx) => {
+          {faqs.map((faq, idx) => {
             const isOpen = openIndex === idx;
 
             return (
