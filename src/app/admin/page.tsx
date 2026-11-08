@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
+  const [mounted, setMounted] = useState(false);
   const [stats, setStats] = useState({
     totalProducts: 0,
     activeProducts: 0,
@@ -29,6 +30,7 @@ export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setMounted(true);
     async function loadData() {
       try {
         const [prodRes, catRes, testRes, faqRes] = await Promise.all([
@@ -73,6 +75,10 @@ export default function AdminDashboardPage() {
 
     loadData();
   }, []);
+
+  if (!mounted) {
+    return null;
+  }
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto">

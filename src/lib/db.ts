@@ -1,15 +1,19 @@
 import Database from "better-sqlite3";
 import path from "path";
-import { existsSync } from "fs";
-
-const DB_PATH = path.join(process.cwd(), "prisma", "dev.db");
+import fs from "fs";
 
 let db: Database.Database;
 
 export function getDb(): Database.Database {
   if (!db) {
-    db = new Database(DB_PATH);
-    db.pragma("journal_mode = WAL");
+    const prismaDir = path.join(process.cwd(), "prisma");
+    if (!fs.existsSync(prismaDir)) {
+      fs.mkdirSync(prismaDir, { recursive: true });
+    }
+    const DB_PATH = path.join(prismaDir, "dev.db");
+
+    db = new Database(DB_PATH, { timeout: 5000 });
+    db.pragma("journal_mode = DELETE");
     db.pragma("foreign_keys = ON");
     initializeDatabase(db);
   }
@@ -122,4 +126,3 @@ export function generateSlug(text: string): string {
     .replace(/-+/g, "-")
     .trim();
 }
-

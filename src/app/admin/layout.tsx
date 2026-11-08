@@ -33,6 +33,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const [admin, setAdmin] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Login form state
@@ -58,6 +59,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   useEffect(() => {
+    setMounted(true);
     checkAuth();
   }, []);
 
@@ -100,7 +102,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     }
   };
 
-  if (loading) {
+  if (!mounted || loading) {
     return (
       <div className="min-h-screen bg-stone-100 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
