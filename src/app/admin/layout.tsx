@@ -19,7 +19,9 @@ import {
   User,
   ShieldCheck,
   ChevronRight,
-  Store
+  Store,
+  Clock,
+  AlertCircle
 } from "lucide-react";
 
 interface AdminUser {
@@ -62,6 +64,46 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setMounted(true);
     checkAuth();
   }, []);
+
+  // Inactivity timeout: Auto-logout after 1 hour (3600 seconds) of no user activity
+  const INACTIVITY_TIMEOUT_MS = 60 * 60 * 1000; // 1 hour
+
+  useEffect(() => {
+    if (!admin) return;
+
+    let timeoutId: NodeJS.Timeout;
+
+    const performAutoLogout = async () => {
+      try {
+        await fetch("/api/admin/auth/logout", { method: "POST" });
+      } catch (err) {
+        console.error("Auto logout failed", err);
+      }
+      setAdmin(null);
+      setLoginError("Sesi Anda telah berakhir karena tidak ada aktivitas selama lebih dari 1 jam. Silakan login kembali untuk melanjutkan.");
+    };
+
+    const resetInactivityTimer = () => {
+      clearTimeout(timeoutId);
+      timeoutId = setTimeout(performAutoLogout, INACTIVITY_TIMEOUT_MS);
+    };
+
+    // User activity events to reset inactivity timer
+    const activityEvents = ["mousemove", "mousedown", "keydown", "scroll", "touchstart"];
+    activityEvents.forEach((evt) => {
+      window.addEventListener(evt, resetInactivityTimer, { passive: true });
+    });
+
+    // Start 1-hour countdown timer on initial load/login
+    resetInactivityTimer();
+
+    return () => {
+      clearTimeout(timeoutId);
+      activityEvents.forEach((evt) => {
+        window.removeEventListener(evt, resetInactivityTimer);
+      });
+    };
+  }, [admin]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,8 +188,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
 
             {loginError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-600 font-medium">
-                {loginError}
+              <div className={`p-3.5 rounded-xl text-xs font-medium flex items-start gap-2.5 ${
+                loginError.includes("1 jam") || loginError.includes("berakhir")
+                  ? "bg-amber-50 border border-amber-200 text-amber-900"
+                  : "bg-red-50 border border-red-200 text-red-600"
+              }`}>
+                {loginError.includes("1 jam") || loginError.includes("berakhir") ? (
+                  <Clock className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                )}
+                <span className="leading-relaxed">{loginError}</span>
               </div>
             )}
 

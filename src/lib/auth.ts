@@ -24,7 +24,7 @@ export function createToken(admin: AdminUser): string {
   return jwt.sign(
     { id: admin.id, username: admin.username, name: admin.name },
     JWT_SECRET,
-    { expiresIn: "7d" }
+    { expiresIn: "1h" }
   );
 }
 
@@ -50,7 +50,7 @@ export async function setAuthCookie(token: string) {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
-    maxAge: 7 * 24 * 60 * 60, // 7 days
+    maxAge: 60 * 60, // 1 hour (3600 seconds)
     path: "/",
   });
 }
