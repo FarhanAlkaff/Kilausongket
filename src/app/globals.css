@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-forest: #263B32;
+  --color-forest-dark: #1B2A24;
+  --color-forest-light: #365246;
+  --color-gold: #C5A46D;
+  --color-gold-light: #E3CCA2;
+  --color-gold-dark: #9E7E47;
+  --color-ivory: #F7F4EE;
+  --color-ivory-warm: #FAF8F5;
+  --color-charcoal: #292724;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+body {
+  color: #292724;
+  background-color: #FAF8F5;
+  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Luxury gold text gradient */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #DFB776 0%, #C5A46D 50%, #9E7E47 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-forest-gradient {
+  background: linear-gradient(135deg, #365246 0%, #263B32 70%, #17231E 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.bg-gold-gradient {
+  background: linear-gradient(135deg, #E3CCA2 0%, #C5A46D 60%, #A6834A 100%);
+}
+
+.bg-forest-gradient {
+  background: linear-gradient(145deg, #263B32 0%, #1E3029 60%, #15221D 100%);
+}
+
+/* Songket Pattern Subtle Grid */
+.bg-songket-pattern {
+  background-color: #FAF8F5;
+  background-image: radial-gradient(#C5A46D 0.75px, transparent 0.75px), radial-gradient(#263B32 0.75px, #FAF8F5 0.75px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+  background-opacity: 0.05;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F4EE;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C5A46D;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9E7E47;
+}
+
+/* Glassmorphism */
+.glass-header {
+  background: rgba(250, 248, 245, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-dark {
+  background: rgba(27, 42, 36, 0.95);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+

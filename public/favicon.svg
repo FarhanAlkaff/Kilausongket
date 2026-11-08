@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <rect width="64" height="64" rx="14" fill="#263B32"/>
+  <!-- Sparkles -->
+  <path d="M12 28 Q 12 32 8 32 Q 12 32 12 36 Q 12 32 16 32 Q 12 32 12 28 Z" fill="#C5A46D"/>
+  <path d="M52 14 Q 52 18 48 18 Q 52 18 52 22 Q 52 18 56 18 Q 52 18 52 14 Z" fill="#C5A46D"/>
+  <!-- Songket Monogram K -->
+  <!-- Left Column: Top & Bottom Block -->
+  <path d="M22 18 H32 L30 23 H22 Z" fill="#FAF8F5"/>
+  <path d="M22 28 H27 L33 34 L27 40 H22 Z" fill="#C5A46D"/>
+  <path d="M22 45 H32 L30 50 H22 Z" fill="#FAF8F5"/>
+  <!-- Right Wings of K -->
+  <path d="M28 34 L42 18 H50 L35 34 Z" fill="#FAF8F5"/>
+  <path d="M34 34 L50 50 H41 L27 34 Z" fill="#C5A46D"/>
+</svg>
+
