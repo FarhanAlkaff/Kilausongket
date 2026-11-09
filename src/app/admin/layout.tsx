@@ -21,7 +21,10 @@ import {
   ChevronRight,
   Store,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Lock,
+  Eye,
+  EyeOff
 } from "lucide-react";
 
 interface AdminUser {
@@ -43,6 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const [loginPassword, setLoginPassword] = useState("");
   const [loginError, setLoginError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const checkAuth = async () => {
     try {
@@ -165,38 +169,44 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  // Not authenticated: Show Login Card
+  // Not authenticated: Show Modern Luxury Login Card
   if (!admin) {
     return (
-      <div className="min-h-screen bg-stone-100 flex flex-col items-center justify-center p-4">
-        <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-stone-200 overflow-hidden">
-          {/* Header banner */}
-          <div className="bg-forest px-6 py-8 text-center text-white relative">
-            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-white/10 p-1 flex items-center justify-center border border-gold/40 shadow-inner">
-              <div className="w-12 h-12 relative rounded-full overflow-hidden bg-white">
-                <Image
-                  src="/images/logo.jpg"
-                  alt="Kilau Songket"
-                  fill
-                  className="object-contain p-1"
-                />
-              </div>
+      <div className="min-h-screen bg-[#07130F] relative overflow-hidden flex flex-col items-center justify-center p-4 sm:p-6 selection:bg-gold/30">
+        {/* Ambient Decorative Luxury Glows */}
+        <div className="absolute -top-32 -left-32 w-96 h-96 bg-forest/40 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-gold/20 rounded-full blur-[140px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-96 bg-forest-dark/30 rounded-full blur-[150px] pointer-events-none" />
+
+        <div className="w-full max-w-[420px] bg-white rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.6)] border border-stone-200/90 p-7 sm:p-9 relative z-10 overflow-hidden">
+          {/* Subtle Top Gold Accent Line */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-gold/30 via-gold to-gold/30" />
+
+          {/* Header Brand */}
+          <div className="text-center mb-6 pt-1">
+            <div className="w-16 h-16 mx-auto mb-3.5 rounded-2xl bg-white p-2 border-2 border-gold/40 shadow-md flex items-center justify-center relative">
+              <Image
+                src="/images/logo.jpg"
+                alt="Kilau Songket"
+                width={48}
+                height={48}
+                className="object-contain"
+              />
             </div>
-            <h1 className="text-xl font-bold tracking-wider text-gold-light uppercase font-display">
+            <div className="inline-flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-gold-dark uppercase bg-gold/10 px-2.5 py-0.5 rounded-full border border-gold/25 mb-1.5">
+              <Sparkles className="w-3 h-3 text-gold-dark" />
+              <span>Admin Management</span>
+            </div>
+            <h1 className="text-xl font-serif font-bold text-forest-dark tracking-wide">
               Kilau Songket
             </h1>
-            <p className="text-xs text-stone-300 mt-1">Admin Dashboard Management</p>
+            <p className="text-xs text-stone-500 mt-1">
+              Masuk untuk mengelola katalog, banner, dan pengaturan toko.
+            </p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleLogin} className="p-6 sm:p-8 space-y-4">
-            <div>
-              <h2 className="text-lg font-bold text-charcoal">Masuk ke Dashboard</h2>
-              <p className="text-xs text-stone-500 mt-0.5">
-                Kelola katalog produk, banner, dan pengaturan landing page.
-              </p>
-            </div>
-
+          <form onSubmit={handleLogin} className="space-y-4">
             {loginError && (
               <div className={`p-3.5 rounded-xl text-xs font-medium flex items-start gap-2.5 ${
                 loginError.includes("1 jam") || loginError.includes("berakhir")
@@ -213,52 +223,70 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             )}
 
             <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1.5 uppercase tracking-wider">
+              <label className="block text-[11px] font-bold text-stone-700 mb-1.5 uppercase tracking-wider">
                 Username
               </label>
-              <input
-                type="text"
-                required
-                value={loginUsername}
-                onChange={(e) => setLoginUsername(e.target.value)}
-                placeholder="admin"
-                className="w-full px-3.5 py-2.5 text-sm bg-stone-50 border border-stone-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest transition"
-              />
+              <div className="relative">
+                <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type="text"
+                  required
+                  value={loginUsername}
+                  onChange={(e) => setLoginUsername(e.target.value)}
+                  placeholder="admin"
+                  className="w-full pl-10 pr-3.5 py-2.5 text-xs sm:text-sm bg-stone-50/80 border border-stone-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest transition"
+                />
+              </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-stone-700 mb-1.5 uppercase tracking-wider">
+              <label className="block text-[11px] font-bold text-stone-700 mb-1.5 uppercase tracking-wider">
                 Password
               </label>
-              <input
-                type="password"
-                required
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-3.5 py-2.5 text-sm bg-stone-50 border border-stone-300 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest transition"
-              />
-              <p className="text-[11px] text-stone-400 mt-1.5">
-                Default: username <code className="bg-stone-100 px-1 py-0.5 rounded font-mono">admin</code> / password <code className="bg-stone-100 px-1 py-0.5 rounded font-mono">admin123</code>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={loginPassword}
+                  onChange={(e) => setLoginPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-10 py-2.5 text-xs sm:text-sm bg-stone-50/80 border border-stone-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 focus:outline-none"
+                  title={showPassword ? "Sembunyikan password" : "Lihat password"}
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+              <p className="text-[11px] text-stone-400 mt-1.5 flex items-center justify-between">
+                <span>Default: <code className="bg-stone-100 px-1 py-0.5 rounded font-mono text-stone-600">admin</code> / <code className="bg-stone-100 px-1 py-0.5 rounded font-mono text-stone-600">admin123</code></span>
               </p>
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full py-3 px-4 bg-forest hover:bg-forest-light text-white font-semibold text-sm rounded-xl transition duration-200 shadow-md flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 px-4 bg-forest hover:bg-forest-light active:scale-[0.99] text-white font-bold text-xs uppercase tracking-wider rounded-xl transition duration-200 shadow-lg shadow-forest/20 flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
             >
               <ShieldCheck className="w-4 h-4 text-gold-light" />
-              <span>{isSubmitting ? "Memverifikasi..." : "Masuk Dashboard"}</span>
+              <span>{isSubmitting ? "Memverifikasi..." : "Masuk ke Dashboard"}</span>
             </button>
 
-            <div className="pt-2 text-center">
+            <div className="pt-3 border-t border-stone-100 flex items-center justify-between text-[11px] text-stone-400">
+              <span className="flex items-center gap-1 font-medium text-stone-500">
+                <Clock className="w-3.5 h-3.5 text-gold-dark" />
+                Sesi Aman 1 Jam
+              </span>
               <Link
                 href="/"
-                className="inline-flex items-center gap-1.5 text-xs text-stone-500 hover:text-forest transition font-medium"
+                className="inline-flex items-center gap-1 text-stone-500 hover:text-forest transition font-medium"
               >
-                <span>Lihat Website Utama</span>
-                <ExternalLink className="w-3.5 h-3.5" />
+                <span>Website Utama</span>
+                <ExternalLink className="w-3 h-3" />
               </Link>
             </div>
           </form>
@@ -278,12 +306,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   ];
 
   return (
-    <div className="min-h-screen bg-stone-50 flex">
-      {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex w-64 bg-forest text-white flex-col flex-shrink-0 z-30 shadow-xl border-r border-stone-800">
+    <div className="min-h-screen bg-stone-50/70 flex">
+      {/* Sidebar Desktop - Compact & Fitted */}
+      <aside className="hidden lg:flex w-60 bg-forest text-white flex-col flex-shrink-0 z-30 shadow-xl border-r border-stone-800">
         {/* Brand Header */}
-        <div className="p-5 border-b border-forest-light flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white p-1 flex-shrink-0 relative shadow-sm">
+        <div className="p-4 border-b border-forest-light flex items-center gap-2.5">
+          <div className="w-9 h-9 rounded-xl bg-white p-1 flex-shrink-0 relative shadow-sm">
             <Image
               src="/images/logo.jpg"
               alt="Kilau Songket"
@@ -292,18 +320,18 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             />
           </div>
           <div className="overflow-hidden">
-            <div className="text-sm font-bold tracking-wider text-gold-light uppercase font-display truncate">
+            <div className="text-xs font-bold tracking-wider text-gold-light uppercase font-display truncate">
               Kilau Songket
             </div>
-            <div className="text-[11px] text-stone-300 flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-gold" />
+            <div className="text-[10px] text-stone-300 flex items-center gap-1">
+              <Sparkles className="w-2.5 h-2.5 text-gold" />
               <span>Admin Center</span>
             </div>
           </div>
         </div>
 
         {/* Nav Links */}
-        <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 p-2.5 space-y-1 overflow-y-auto">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href;
@@ -311,7 +339,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-all ${
+                className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                   isActive
                     ? "bg-forest-light text-white border-l-4 border-gold shadow-sm font-bold"
                     : "text-stone-300 hover:text-white hover:bg-forest-light/60"
@@ -324,11 +352,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             );
           })}
 
-          <div className="pt-4 mt-4 border-t border-forest-light space-y-1">
+          <div className="pt-3 mt-3 border-t border-forest-light/60 space-y-1">
             <Link
               href="/"
               target="_blank"
-              className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-stone-300 hover:text-white hover:bg-forest-light/60 transition"
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-stone-300 hover:text-white hover:bg-forest-light/60 transition"
             >
               <Store className="w-4 h-4 text-stone-400" />
               <span>Buka Website</span>
@@ -337,7 +365,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-red-300 hover:text-red-100 hover:bg-red-900/30 transition text-left"
+              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-300 hover:text-red-100 hover:bg-red-900/30 transition text-left"
             >
               <LogOut className="w-4 h-4 text-red-400" />
               <span>Keluar</span>
@@ -346,9 +374,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         {/* Admin info footer */}
-        <div className="p-4 border-t border-forest-light bg-forest-dark/40 flex items-center gap-3">
-          <div className="w-8 h-8 rounded-full bg-gold/20 flex items-center justify-center text-gold-light font-bold text-xs">
-            <User className="w-4 h-4" />
+        <div className="p-3 border-t border-forest-light bg-forest-dark/40 flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-full bg-gold/20 flex items-center justify-center text-gold-light font-bold text-xs">
+            <User className="w-3.5 h-3.5" />
           </div>
           <div className="overflow-hidden">
             <div className="text-xs font-bold text-white truncate">{admin.name}</div>
@@ -364,13 +392,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             onClick={() => setIsMobileMenuOpen(false)}
           />
-          <div className="relative w-72 max-w-[80vw] bg-forest text-white h-full flex flex-col z-10 shadow-2xl">
+          <div className="relative w-64 max-w-[80vw] bg-forest text-white h-full flex flex-col z-10 shadow-2xl">
             <div className="p-4 border-b border-forest-light flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg bg-white relative">
                   <Image src="/images/logo.jpg" alt="Logo" fill className="object-contain p-0.5" />
                 </div>
-                <span className="font-bold text-sm text-gold-light">KILAU SONGKET</span>
+                <span className="font-bold text-xs text-gold-light">KILAU SONGKET</span>
               </div>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -380,7 +408,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </button>
             </div>
 
-            <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+            <nav className="flex-1 p-2.5 space-y-1 overflow-y-auto">
               {navItems.map((item) => {
                 const Icon = item.icon;
                 const isActive = pathname === item.href;
@@ -389,8 +417,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     key={item.href}
                     href={item.href}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold ${
-                      isActive ? "bg-forest-light text-white border-l-4 border-gold" : "text-stone-300"
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold ${
+                      isActive ? "bg-forest-light text-white border-l-4 border-gold font-bold" : "text-stone-300"
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -403,14 +431,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <Link
                   href="/"
                   target="_blank"
-                  className="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-stone-300"
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-stone-300"
                 >
                   <Store className="w-4 h-4" />
                   <span>Buka Website</span>
                 </Link>
                 <button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold text-red-300 text-left"
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-red-300 text-left"
                 >
                   <LogOut className="w-4 h-4" />
                   <span>Keluar</span>
@@ -423,17 +451,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Navbar */}
-        <header className="sticky top-0 z-20 bg-white border-b border-stone-200 px-4 sm:px-6 py-3 flex items-center justify-between">
+        {/* Top Navbar - Compact & Fitted */}
+        <header className="relative z-20 bg-white border-b border-stone-200/80 px-4 sm:px-6 py-2.5 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden p-2 text-stone-600 hover:bg-stone-100 rounded-lg"
+              className="lg:hidden p-1.5 text-stone-600 hover:bg-stone-100 rounded-lg"
             >
               <Menu className="w-5 h-5" />
             </button>
             <div>
-              <h1 className="text-base sm:text-lg font-bold text-charcoal">
+              <h1 className="text-sm sm:text-base font-bold text-charcoal leading-tight">
                 Panel Kontrol Toko
               </h1>
               <p className="text-[11px] text-stone-500 hidden sm:block">
@@ -442,11 +470,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             <Link
               href="/"
               target="_blank"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-forest bg-forest/10 hover:bg-forest/15 rounded-full transition"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-forest bg-forest/10 hover:bg-forest/15 rounded-full transition"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Pratinjau Toko</span>
@@ -454,7 +482,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
             <button
               onClick={handleLogout}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-stone-600 hover:text-red-600 hover:bg-red-50 rounded-full transition"
+              className="flex items-center gap-1.5 px-3 py-1 text-xs font-semibold text-stone-600 hover:text-red-600 hover:bg-red-50 rounded-full transition"
               title="Keluar dari akun admin"
             >
               <LogOut className="w-3.5 h-3.5" />
@@ -464,7 +492,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
+        <main className="flex-1 p-4 sm:p-5 lg:p-6 overflow-y-auto">
           {children}
         </main>
       </div>

@@ -63,11 +63,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenSizeGuide, onSelectCategor
 
   return (
     <header 
-      className={`sticky top-0 z-40 transition-all duration-300 ${
-        isScrolled 
-          ? "glass-header shadow-sm border-b border-stone-200/60 py-3" 
-          : "bg-ivory-warm/95 border-b border-stone-200/50 py-4"
-      }`}
+      className="relative z-40 bg-ivory-warm/95 border-b border-stone-200/50 py-2.5 sm:py-3 transition-all"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between gap-4">
