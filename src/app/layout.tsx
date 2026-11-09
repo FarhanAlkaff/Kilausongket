@@ -7,9 +7,9 @@ export const metadata: Metadata = {
   description: "Koleksi busana songket eksklusif anak-anak dan dewasa dengan furing katun lembut anti-gatal, tenunan benang emas presisi, dan desain modern. Pesan via WhatsApp & Shopee.",
   keywords: ["songket anak", "baju adat songket", "songket palembang", "sarimbit songket keluarga", "kebaya songket modern", "kemeja songket pria", "kilau songket"],
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/favicon.svg",
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/favicon.png",
   },
   openGraph: {
     title: "Kilau Songket - Keanggunan Warisan Songket untuk Seluruh Generasi",
