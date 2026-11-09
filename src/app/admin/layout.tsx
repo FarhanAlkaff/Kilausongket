@@ -307,8 +307,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="min-h-screen bg-stone-50/70 flex">
-      {/* Sidebar Desktop - Compact & Fitted */}
-      <aside className="hidden lg:flex w-60 bg-forest text-white flex-col flex-shrink-0 z-30 shadow-xl border-r border-stone-800">
+      {/* Sidebar Desktop - Fixed/Sticky Height & Never Scrolls Away */}
+      <aside className="hidden lg:flex w-60 bg-forest text-white flex-col flex-shrink-0 z-30 shadow-xl border-r border-stone-800 h-screen sticky top-0">
         {/* Brand Header */}
         <div className="p-4 border-b border-forest-light flex items-center gap-2.5">
           <div className="w-9 h-9 rounded-xl bg-white p-1 flex-shrink-0 relative shadow-sm">
