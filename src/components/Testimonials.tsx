@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import { Star, Quote, CheckCircle2, MessageCircle, X, ExternalLink } from "lucide-react";
+import { Star, CheckCircle2, MessageCircle, X, ExternalLink } from "lucide-react";
 import ShopeeIcon from "@/components/ShopeeIcon";
 import { TESTIMONIALS } from "@/data/products";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/motion-wrapper";
@@ -52,9 +52,6 @@ export const Testimonials: React.FC<TestimonialsProps> = ({ testimonials = TESTI
                 whileHover={{ y: -4, transition: { duration: 0.2 } }}
                 className="bg-white p-6 sm:p-8 rounded-3xl border border-stone-200/90 shadow-sm hover:shadow-xl hover:border-gold/40 transition-all duration-300 flex flex-col justify-between relative group h-full"
               >
-                {/* Quote Icon Background */}
-                <Quote className="absolute top-6 right-6 w-10 h-10 text-gold/15 group-hover:text-gold/30 transition-colors pointer-events-none" />
-
                 <div>
                   {/* Rating & Event Tag / Shopee Badge */}
                   <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
