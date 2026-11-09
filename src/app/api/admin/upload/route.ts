@@ -19,20 +19,35 @@ export async function POST(req: NextRequest) {
 
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+    const mime = file.type || "image/jpeg";
+    const isVercel = Boolean(process.env.VERCEL);
 
-    // Ensure uploads directory exists
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
-    await mkdir(uploadDir, { recursive: true });
+    if (isVercel) {
+      // On Vercel serverless (read-only filesystem), encode image as reliable Data URL
+      const base64 = buffer.toString("base64");
+      const dataUrl = `data:${mime};base64,${base64}`;
+      return NextResponse.json({ success: true, url: dataUrl });
+    }
 
-    // Clean filename
-    const ext = path.extname(file.name) || ".jpg";
-    const filename = `ks-${Date.now()}-${Math.random().toString(36).substring(2, 7)}${ext}`;
-    const filePath = path.join(uploadDir, filename);
+    // Local environment: save to public/uploads
+    try {
+      const uploadDir = path.join(process.cwd(), "public", "uploads");
+      await mkdir(uploadDir, { recursive: true });
 
-    await writeFile(filePath, buffer);
+      const ext = path.extname(file.name) || ".jpg";
+      const filename = `ks-${Date.now()}-${Math.random().toString(36).substring(2, 7)}${ext}`;
+      const filePath = path.join(uploadDir, filename);
 
-    const publicUrl = `/uploads/${filename}`;
-    return NextResponse.json({ success: true, url: publicUrl });
+      await writeFile(filePath, buffer);
+
+      const publicUrl = `/uploads/${filename}`;
+      return NextResponse.json({ success: true, url: publicUrl });
+    } catch {
+      // Fallback to Data URL if filesystem write is blocked
+      const base64 = buffer.toString("base64");
+      const dataUrl = `data:${mime};base64,${base64}`;
+      return NextResponse.json({ success: true, url: dataUrl });
+    }
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

@@ -66,6 +66,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 src={selectedImage}
                 alt={product.name}
                 fill
+                unoptimized={selectedImage?.startsWith("data:")}
                 className="object-cover"
                 priority
               />
@@ -88,7 +89,13 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                       selectedImage === img ? "border-gold ring-2 ring-gold/40 scale-95" : "border-stone-200 opacity-70 hover:opacity-100"
                     }`}
                   >
-                    <Image src={img} alt={`Thumbnail ${idx}`} fill className="object-cover" />
+                    <Image
+                      src={img}
+                      alt={`Thumbnail ${idx}`}
+                      fill
+                      unoptimized={img?.startsWith("data:")}
+                      className="object-cover"
+                    />
                   </button>
                 ))}
               </div>

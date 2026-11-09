@@ -259,6 +259,7 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
                         src={product.images[0]}
                         alt={product.name}
                         fill
+                        unoptimized={product.images[0]?.startsWith("data:")}
                         className="object-cover group-hover:scale-106 transition-transform duration-500"
                       />
 
