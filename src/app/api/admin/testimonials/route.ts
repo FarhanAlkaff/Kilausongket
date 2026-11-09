@@ -1,14 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb, generateId } from "@/lib/db";
 import { getAuthAdmin } from "@/lib/auth";
+import { isPostgresAvailable, initPostgres, getPostgresClient } from "@/lib/postgres";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export async function GET() {
   try {
-    const db = getDb();
-    const rows = db.prepare("SELECT * FROM testimonials ORDER BY sort_order ASC, id DESC").all() as any[];
+    let rows: any[] = [];
+    if (isPostgresAvailable()) {
+      await initPostgres();
+      const sql = getPostgresClient();
+      rows = (await sql`SELECT * FROM testimonials ORDER BY sort_order ASC, id DESC`) as any[];
+    } else {
+      const db = getDb();
+      rows = db.prepare("SELECT * FROM testimonials ORDER BY sort_order ASC, id DESC").all() as any[];
+    }
+
     const testimonials = rows.map((r) => ({
       id: r.id,
       name: r.name,
@@ -43,26 +52,49 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: "Nama dan isi testimoni wajib diisi" }, { status: 400 });
     }
 
-    const db = getDb();
     const id = generateId();
 
-    db.prepare(`
-      INSERT INTO testimonials (id, name, city, role, event, rating, content, product_purchased, source, photo_url, is_active, sort_order)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(
-      id,
-      name,
-      city || "",
-      role || "Pelanggan Shopee",
-      event || "",
-      rating !== undefined ? Number(rating) : 5,
-      content,
-      productPurchased || "",
-      source || "shopee",
-      photoUrl || "",
-      isActive !== undefined ? (isActive ? 1 : 0) : 1,
-      sortOrder !== undefined ? Number(sortOrder) : 0
-    );
+    if (isPostgresAvailable()) {
+      await initPostgres();
+      const sql = getPostgresClient();
+      await sql.query(
+        `INSERT INTO testimonials (id, name, city, role, event, rating, content, product_purchased, source, photo_url, is_active, sort_order)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+        [
+          id,
+          name,
+          city || "",
+          role || "Pelanggan Shopee",
+          event || "",
+          rating !== undefined ? Number(rating) : 5,
+          content,
+          productPurchased || "",
+          source || "shopee",
+          photoUrl || "",
+          isActive !== undefined ? (isActive ? 1 : 0) : 1,
+          sortOrder !== undefined ? Number(sortOrder) : 0,
+        ]
+      );
+    } else {
+      const db = getDb();
+      db.prepare(`
+        INSERT INTO testimonials (id, name, city, role, event, rating, content, product_purchased, source, photo_url, is_active, sort_order)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        id,
+        name,
+        city || "",
+        role || "Pelanggan Shopee",
+        event || "",
+        rating !== undefined ? Number(rating) : 5,
+        content,
+        productPurchased || "",
+        source || "shopee",
+        photoUrl || "",
+        isActive !== undefined ? (isActive ? 1 : 0) : 1,
+        sortOrder !== undefined ? Number(sortOrder) : 0
+      );
+    }
 
     return NextResponse.json({ success: true, data: { id, message: "Testimoni berhasil ditambahkan" } });
   } catch (error: any) {

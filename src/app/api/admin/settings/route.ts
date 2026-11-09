@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { getAuthAdmin } from "@/lib/auth";
+import { isPostgresAvailable, initPostgres, getPostgresClient } from "@/lib/postgres";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -8,8 +9,17 @@ export const revalidate = 0;
 // GET /api/admin/settings
 export async function GET() {
   try {
-    const db = getDb();
-    const settings = db.prepare("SELECT * FROM store_settings WHERE id = 'main'").get() as any;
+    let settings: any = null;
+
+    if (isPostgresAvailable()) {
+      await initPostgres();
+      const sql = getPostgresClient();
+      const rows = (await sql`SELECT * FROM store_settings WHERE id = 'main' LIMIT 1`) as any[];
+      settings = rows[0] || null;
+    } else {
+      const db = getDb();
+      settings = db.prepare("SELECT * FROM store_settings WHERE id = 'main'").get() as any;
+    }
 
     if (!settings) {
       return NextResponse.json({ success: true, data: {} });
@@ -68,49 +78,96 @@ export async function PUT(req: NextRequest) {
       aboutText,
     } = body;
 
-    const db = getDb();
+    if (isPostgresAvailable()) {
+      await initPostgres();
+      const sql = getPostgresClient();
+      await sql.query(
+        `INSERT INTO store_settings (
+          id, name, tagline, whatsapp_number, whatsapp_display, shopee_url,
+          instagram_url, tiktok_url, email, operational_hours, address,
+          promo_title, promo_subtitle, hero_title, hero_subtitle, about_text
+        ) VALUES (
+          'main', $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+        )
+        ON CONFLICT(id) DO UPDATE SET
+          name = COALESCE(EXCLUDED.name, store_settings.name),
+          tagline = COALESCE(EXCLUDED.tagline, store_settings.tagline),
+          whatsapp_number = COALESCE(EXCLUDED.whatsapp_number, store_settings.whatsapp_number),
+          whatsapp_display = COALESCE(EXCLUDED.whatsapp_display, store_settings.whatsapp_display),
+          shopee_url = COALESCE(EXCLUDED.shopee_url, store_settings.shopee_url),
+          instagram_url = COALESCE(EXCLUDED.instagram_url, store_settings.instagram_url),
+          tiktok_url = COALESCE(EXCLUDED.tiktok_url, store_settings.tiktok_url),
+          email = COALESCE(EXCLUDED.email, store_settings.email),
+          operational_hours = COALESCE(EXCLUDED.operational_hours, store_settings.operational_hours),
+          address = COALESCE(EXCLUDED.address, store_settings.address),
+          promo_title = COALESCE(EXCLUDED.promo_title, store_settings.promo_title),
+          promo_subtitle = COALESCE(EXCLUDED.promo_subtitle, store_settings.promo_subtitle),
+          hero_title = COALESCE(EXCLUDED.hero_title, store_settings.hero_title),
+          hero_subtitle = COALESCE(EXCLUDED.hero_subtitle, store_settings.hero_subtitle),
+          about_text = COALESCE(EXCLUDED.about_text, store_settings.about_text)`,
+        [
+          name,
+          tagline,
+          whatsappNumber,
+          whatsappDisplay,
+          shopeeUrl,
+          instagramUrl,
+          tiktokUrl,
+          email,
+          operationalHours,
+          address,
+          promoTitle,
+          promoSubtitle,
+          heroTitle,
+          heroSubtitle,
+          aboutText,
+        ]
+      );
+    } else {
+      const db = getDb();
 
-    db.prepare(`
-      INSERT INTO store_settings (
-        id, name, tagline, whatsapp_number, whatsapp_display, shopee_url,
-        instagram_url, tiktok_url, email, operational_hours, address,
-        promo_title, promo_subtitle, hero_title, hero_subtitle, about_text
-      ) VALUES (
-        'main', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
-      )
-      ON CONFLICT(id) DO UPDATE SET
-        name = COALESCE(excluded.name, store_settings.name),
-        tagline = COALESCE(excluded.tagline, store_settings.tagline),
-        whatsapp_number = COALESCE(excluded.whatsapp_number, store_settings.whatsapp_number),
-        whatsapp_display = COALESCE(excluded.whatsapp_display, store_settings.whatsapp_display),
-        shopee_url = COALESCE(excluded.shopee_url, store_settings.shopee_url),
-        instagram_url = COALESCE(excluded.instagram_url, store_settings.instagram_url),
-        tiktok_url = COALESCE(excluded.tiktok_url, store_settings.tiktok_url),
-        email = COALESCE(excluded.email, store_settings.email),
-        operational_hours = COALESCE(excluded.operational_hours, store_settings.operational_hours),
-        address = COALESCE(excluded.address, store_settings.address),
-        promo_title = COALESCE(excluded.promo_title, store_settings.promo_title),
-        promo_subtitle = COALESCE(excluded.promo_subtitle, store_settings.promo_subtitle),
-        hero_title = COALESCE(excluded.hero_title, store_settings.hero_title),
-        hero_subtitle = COALESCE(excluded.hero_subtitle, store_settings.hero_subtitle),
-        about_text = COALESCE(excluded.about_text, store_settings.about_text)
-    `).run(
-      name,
-      tagline,
-      whatsappNumber,
-      whatsappDisplay,
-      shopeeUrl,
-      instagramUrl,
-      tiktokUrl,
-      email,
-      operationalHours,
-      address,
-      promoTitle,
-      promoSubtitle,
-      heroTitle,
-      heroSubtitle,
-      aboutText
-    );
+      db.prepare(`
+        INSERT INTO store_settings (
+          id, name, tagline, whatsapp_number, whatsapp_display, shopee_url,
+          instagram_url, tiktok_url, email, operational_hours, address,
+          promo_title, promo_subtitle, hero_title, hero_subtitle, about_text
+        ) VALUES (
+          'main', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+        )
+        ON CONFLICT(id) DO UPDATE SET
+          name = COALESCE(excluded.name, store_settings.name),
+          tagline = COALESCE(excluded.tagline, store_settings.tagline),
+          whatsapp_number = COALESCE(excluded.whatsapp_number, store_settings.whatsapp_number),
+          whatsapp_display = COALESCE(excluded.whatsapp_display, store_settings.whatsapp_display),
+          shopee_url = COALESCE(excluded.shopee_url, store_settings.shopee_url),
+          instagram_url = COALESCE(excluded.instagram_url, store_settings.instagram_url),
+          tiktok_url = COALESCE(excluded.tiktok_url, store_settings.tiktok_url),
+          email = COALESCE(excluded.email, store_settings.email),
+          operational_hours = COALESCE(excluded.operational_hours, store_settings.operational_hours),
+          address = COALESCE(excluded.address, store_settings.address),
+          promo_title = COALESCE(excluded.promo_title, store_settings.promo_title),
+          promo_subtitle = COALESCE(excluded.promo_subtitle, store_settings.promo_subtitle),
+          hero_title = COALESCE(excluded.hero_title, store_settings.hero_title),
+          hero_subtitle = COALESCE(excluded.hero_subtitle, store_settings.hero_subtitle),
+          about_text = COALESCE(excluded.about_text, store_settings.about_text)
+      `).run(
+        name,
+        tagline,
+        whatsappNumber,
+        whatsappDisplay,
+        shopeeUrl,
+        instagramUrl,
+        tiktokUrl,
+        email,
+        operationalHours,
+        address,
+        promoTitle,
+        promoSubtitle,
+        heroTitle,
+        heroSubtitle,
+        aboutText
+      );
+    }
 
     return NextResponse.json({ success: true, message: "Pengaturan berhasil disimpan" });
   } catch (error: any) {

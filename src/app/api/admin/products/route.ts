@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb, generateId, generateSlug } from "@/lib/db";
 import { getAuthAdmin } from "@/lib/auth";
+import { isPostgresAvailable, initPostgres, getPostgresClient } from "@/lib/postgres";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -18,34 +19,67 @@ export async function GET(req: NextRequest) {
     const search = searchParams.get("search");
     const countOnly = searchParams.get("count");
 
-    const db = getDb();
+    let rows: any[] = [];
 
-    if (countOnly === "true") {
-      const total = db.prepare("SELECT COUNT(*) as count FROM products").get() as any;
-      const active = db.prepare("SELECT COUNT(*) as count FROM products WHERE is_active = 1").get() as any;
-      return NextResponse.json({
-        success: true,
-        data: { total: total.count, active: active.count },
-      });
+    if (isPostgresAvailable()) {
+      await initPostgres();
+      const sql = getPostgresClient();
+
+      if (countOnly === "true") {
+        const total = await sql`SELECT COUNT(*) as count FROM products`;
+        const active = await sql`SELECT COUNT(*) as count FROM products WHERE is_active = 1`;
+        return NextResponse.json({
+          success: true,
+          data: { total: Number(total[0]?.count || 0), active: Number(active[0]?.count || 0) },
+        });
+      }
+
+      let query = "SELECT * FROM products WHERE 1=1";
+      const pgParams: any[] = [];
+      let pIdx = 1;
+
+      if (category && category !== "all") {
+        query += ` AND category = $${pIdx++}`;
+        pgParams.push(category);
+      }
+
+      if (search) {
+        query += ` AND (name ILIKE $${pIdx} OR motif ILIKE $${pIdx} OR material ILIKE $${pIdx})`;
+        pgParams.push(`%${search}%`);
+        pIdx++;
+      }
+
+      query += " ORDER BY sort_order ASC, created_at DESC";
+      rows = (await sql.query(query, pgParams)) as any[];
+    } else {
+      const db = getDb();
+
+      if (countOnly === "true") {
+        const total = db.prepare("SELECT COUNT(*) as count FROM products").get() as any;
+        const active = db.prepare("SELECT COUNT(*) as count FROM products WHERE is_active = 1").get() as any;
+        return NextResponse.json({
+          success: true,
+          data: { total: total.count, active: active.count },
+        });
+      }
+
+      let query = "SELECT * FROM products WHERE 1=1";
+      const params: any[] = [];
+
+      if (category && category !== "all") {
+        query += " AND category = ?";
+        params.push(category);
+      }
+
+      if (search) {
+        query += " AND (name LIKE ? OR motif LIKE ? OR material LIKE ?)";
+        const term = `%${search}%`;
+        params.push(term, term, term);
+      }
+
+      query += " ORDER BY sort_order ASC, created_at DESC";
+      rows = db.prepare(query).all(...params) as any[];
     }
-
-    let query = "SELECT * FROM products WHERE 1=1";
-    const params: any[] = [];
-
-    if (category && category !== "all") {
-      query += " AND category = ?";
-      params.push(category);
-    }
-
-    if (search) {
-      query += " AND (name LIKE ? OR motif LIKE ? OR material LIKE ?)";
-      const term = `%${search}%`;
-      params.push(term, term, term);
-    }
-
-    query += " ORDER BY sort_order ASC, created_at DESC";
-
-    const rows = db.prepare(query).all(...params) as any[];
 
     // Parse JSON fields
     const products = rows.map((row) => ({
@@ -112,56 +146,108 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const db = getDb();
     const id = generateId();
     let slug = generateSlug(name);
 
-    // Ensure slug is unique
-    const existingSlug = db.prepare("SELECT id FROM products WHERE slug = ?").get(slug);
-    if (existingSlug) {
-      slug = `${slug}-${Date.now().toString(36)}`;
+    if (isPostgresAvailable()) {
+      await initPostgres();
+      const sql = getPostgresClient();
+
+      const existingSlug = (await sql.query("SELECT id FROM products WHERE slug = $1", [slug])) as any[];
+      if (existingSlug.length > 0) {
+        slug = `${slug}-${Date.now().toString(36)}`;
+      }
+
+      const maxOrder = (await sql`SELECT MAX(sort_order) as max FROM products`) as any[];
+      const sortOrder = (Number(maxOrder[0]?.max) ?? -1) + 1;
+
+      await sql.query(
+        `INSERT INTO products (
+          id, slug, name, category, sub_category, category_label, price, original_price,
+          images, motif, material, furing, available_sizes, colors,
+          is_featured, is_best_seller, is_new, is_active,
+          description, specs, shopee_url, sort_order
+        ) VALUES (
+          $1, $2, $3, $4, $5, $6, $7, $8,
+          $9, $10, $11, $12, $13, $14,
+          $15, $16, $17, $18,
+          $19, $20, $21, $22
+        )`,
+        [
+          id,
+          slug,
+          name,
+          category,
+          subCategory || category,
+          categoryLabel || category,
+          Number(price),
+          originalPrice ? Number(originalPrice) : null,
+          JSON.stringify(images || []),
+          motif || "",
+          material || "",
+          furing || "",
+          JSON.stringify(availableSizes || []),
+          JSON.stringify(colors || []),
+          isFeatured ? 1 : 0,
+          isBestSeller ? 1 : 0,
+          isNew ? 1 : 0,
+          isActive !== undefined ? (isActive ? 1 : 0) : 1,
+          description || "",
+          JSON.stringify(specs || []),
+          shopeeUrl || "",
+          sortOrder,
+        ]
+      );
+    } else {
+      const db = getDb();
+
+      // Ensure slug is unique
+      const existingSlug = db.prepare("SELECT id FROM products WHERE slug = ?").get(slug);
+      if (existingSlug) {
+        slug = `${slug}-${Date.now().toString(36)}`;
+      }
+
+      // Get max sort_order
+      const maxOrder = db.prepare("SELECT MAX(sort_order) as max FROM products").get() as any;
+      const sortOrder = (maxOrder?.max ?? -1) + 1;
+
+      db.prepare(`
+        INSERT INTO products (
+          id, slug, name, category, sub_category, category_label, price, original_price,
+          images, motif, material, furing, available_sizes, colors,
+          is_featured, is_best_seller, is_new, is_active,
+          description, specs, shopee_url, sort_order
+        ) VALUES (
+          ?, ?, ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?, ?, ?,
+          ?, ?, ?, ?,
+          ?, ?, ?, ?
+        )
+      `).run(
+        id,
+        slug,
+        name,
+        category,
+        subCategory || category,
+        categoryLabel || category,
+        Number(price),
+        originalPrice ? Number(originalPrice) : null,
+        JSON.stringify(images || []),
+        motif || "",
+        material || "",
+        furing || "",
+        JSON.stringify(availableSizes || []),
+        JSON.stringify(colors || []),
+        isFeatured ? 1 : 0,
+        isBestSeller ? 1 : 0,
+        isNew ? 1 : 0,
+        isActive !== undefined ? (isActive ? 1 : 0) : 1,
+        description || "",
+        JSON.stringify(specs || []),
+        shopeeUrl || "",
+        sortOrder
+      );
     }
-
-    // Get max sort_order
-    const maxOrder = db.prepare("SELECT MAX(sort_order) as max FROM products").get() as any;
-    const sortOrder = (maxOrder?.max ?? -1) + 1;
-
-    db.prepare(`
-      INSERT INTO products (
-        id, slug, name, category, sub_category, category_label, price, original_price,
-        images, motif, material, furing, available_sizes, colors,
-        is_featured, is_best_seller, is_new, is_active,
-        description, specs, shopee_url, sort_order
-      ) VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?, ?, ?,
-        ?, ?, ?, ?,
-        ?, ?, ?, ?
-      )
-    `).run(
-      id,
-      slug,
-      name,
-      category,
-      subCategory || category,
-      categoryLabel || category,
-      Number(price),
-      originalPrice ? Number(originalPrice) : null,
-      JSON.stringify(images || []),
-      motif || "",
-      material || "",
-      furing || "",
-      JSON.stringify(availableSizes || []),
-      JSON.stringify(colors || []),
-      isFeatured ? 1 : 0,
-      isBestSeller ? 1 : 0,
-      isNew ? 1 : 0,
-      isActive !== undefined ? (isActive ? 1 : 0) : 1,
-      description || "",
-      JSON.stringify(specs || []),
-      shopeeUrl || "",
-      sortOrder
-    );
 
     return NextResponse.json({
       success: true,

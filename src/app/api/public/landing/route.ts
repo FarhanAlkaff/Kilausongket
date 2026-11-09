@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed";
+import { isPostgresAvailable, initPostgres, getPostgresClient } from "@/lib/postgres";
 import { PRODUCTS, CATEGORIES, TESTIMONIALS, FAQS, STORE_INFO } from "@/data/products";
 
 export const dynamic = "force-dynamic";
@@ -15,13 +16,32 @@ const NO_CACHE_HEADERS = {
 
 export async function GET() {
   try {
-    try {
-      seedDatabase();
-    } catch {}
-    const db = getDb();
+    let productRows: any[] = [];
+    let catRows: any[] = [];
+    let testRows: any[] = [];
+    let faqRows: any[] = [];
+    let settings: any = null;
 
-    // Products
-    const productRows = db.prepare("SELECT * FROM products WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC").all() as any[];
+    if (isPostgresAvailable()) {
+      await initPostgres();
+      const sql = getPostgresClient();
+      productRows = (await sql`SELECT * FROM products WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC`) as any[];
+      catRows = (await sql`SELECT * FROM categories WHERE is_active = 1 ORDER BY sort_order ASC`) as any[];
+      testRows = (await sql`SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order ASC`) as any[];
+      faqRows = (await sql`SELECT * FROM faqs WHERE is_active = 1 ORDER BY sort_order ASC`) as any[];
+      const setList = (await sql`SELECT * FROM store_settings WHERE id = 'main' LIMIT 1`) as any[];
+      settings = setList[0] || null;
+    } else {
+      try {
+        seedDatabase();
+      } catch {}
+      const db = getDb();
+      productRows = db.prepare("SELECT * FROM products WHERE is_active = 1 ORDER BY sort_order ASC, created_at DESC").all() as any[];
+      catRows = db.prepare("SELECT * FROM categories WHERE is_active = 1 ORDER BY sort_order ASC").all() as any[];
+      testRows = db.prepare("SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order ASC").all() as any[];
+      faqRows = db.prepare("SELECT * FROM faqs WHERE is_active = 1 ORDER BY sort_order ASC").all() as any[];
+      settings = db.prepare("SELECT * FROM store_settings WHERE id = 'main'").get() as any;
+    }
     const products = productRows.map((row) => ({
       ...row,
       images: JSON.parse(row.images || "[]"),
@@ -41,7 +61,6 @@ export async function GET() {
     }));
 
     // Categories with count
-    const catRows = db.prepare("SELECT * FROM categories WHERE is_active = 1 ORDER BY sort_order ASC").all() as any[];
     const categories = catRows.map((cat) => {
       let count = 0;
       if (cat.slug === "all") {
@@ -59,7 +78,6 @@ export async function GET() {
     });
 
     // Testimonials
-    const testRows = db.prepare("SELECT * FROM testimonials WHERE is_active = 1 ORDER BY sort_order ASC").all() as any[];
     const testimonials = testRows.map((t) => ({
       id: t.id,
       name: t.name,
@@ -74,7 +92,6 @@ export async function GET() {
     }));
 
     // FAQs
-    const faqRows = db.prepare("SELECT * FROM faqs WHERE is_active = 1 ORDER BY sort_order ASC").all() as any[];
     const faqs = faqRows.map((f) => ({
       id: f.id,
       question: f.question,
@@ -82,7 +99,6 @@ export async function GET() {
     }));
 
     // Store Settings
-    const settings = db.prepare("SELECT * FROM store_settings WHERE id = 'main'").get() as any;
     const storeInfo = settings
       ? {
           name: settings.name,
