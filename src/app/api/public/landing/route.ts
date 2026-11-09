@@ -58,6 +58,8 @@ export async function GET() {
       rating: t.rating,
       content: t.content,
       productPurchased: t.product_purchased,
+      source: t.source || "shopee",
+      photoUrl: t.photo_url || "",
     }));
 
     // FAQs

@@ -65,6 +65,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     checkAuth();
   }, []);
 
+  // Stealth protection: if not logged in and visitor tries direct /admin (without /Teedud), redirect to home
+  useEffect(() => {
+    if (mounted && !loading && !admin && typeof window !== "undefined") {
+      const currentPath = window.location.pathname.toLowerCase();
+      if (currentPath === "/admin" || currentPath === "/admin/") {
+        router.replace("/");
+      }
+    }
+  }, [mounted, loading, admin, router]);
+
   // Inactivity timeout: Auto-logout after 1 hour (3600 seconds) of no user activity
   const INACTIVITY_TIMEOUT_MS = 60 * 60 * 1000; // 1 hour
 
@@ -138,7 +148,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     try {
       await fetch("/api/admin/auth/logout", { method: "POST" });
       setAdmin(null);
-      router.push("/admin");
+      router.push("/Teedud/Login");
     } catch (err) {
       console.error("Logout error", err);
     }

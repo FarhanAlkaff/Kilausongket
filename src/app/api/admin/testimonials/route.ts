@@ -15,6 +15,8 @@ export async function GET() {
       rating: r.rating,
       content: r.content,
       productPurchased: r.product_purchased,
+      source: r.source || "shopee",
+      photoUrl: r.photo_url || "",
       isActive: Boolean(r.is_active),
       sortOrder: r.sort_order,
     }));
@@ -32,7 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const { name, city, role, event, rating, content, productPurchased, isActive, sortOrder } = body;
+    const { name, city, role, event, rating, content, productPurchased, source, photoUrl, isActive, sortOrder } = body;
 
     if (!name || !content) {
       return NextResponse.json({ success: false, error: "Nama dan isi testimoni wajib diisi" }, { status: 400 });
@@ -42,17 +44,19 @@ export async function POST(req: NextRequest) {
     const id = generateId();
 
     db.prepare(`
-      INSERT INTO testimonials (id, name, city, role, event, rating, content, product_purchased, is_active, sort_order)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO testimonials (id, name, city, role, event, rating, content, product_purchased, source, photo_url, is_active, sort_order)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
       id,
       name,
       city || "",
-      role || "Pelanggan",
+      role || "Pelanggan Shopee",
       event || "",
       rating !== undefined ? Number(rating) : 5,
       content,
       productPurchased || "",
+      source || "shopee",
+      photoUrl || "",
       isActive !== undefined ? (isActive ? 1 : 0) : 1,
       sortOrder !== undefined ? Number(sortOrder) : 0
     );

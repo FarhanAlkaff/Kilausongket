@@ -79,6 +79,8 @@ function initializeDatabase(db: Database.Database) {
       rating INTEGER DEFAULT 5,
       content TEXT NOT NULL,
       product_purchased TEXT,
+      source TEXT DEFAULT 'shopee',
+      photo_url TEXT DEFAULT '',
       is_active INTEGER DEFAULT 1,
       sort_order INTEGER DEFAULT 0
     );
@@ -110,6 +112,14 @@ function initializeDatabase(db: Database.Database) {
       about_text TEXT DEFAULT ''
     );
   `);
+
+  // Safe migration for testimonials extra columns
+  try {
+    db.exec("ALTER TABLE testimonials ADD COLUMN source TEXT DEFAULT 'shopee'");
+  } catch {}
+  try {
+    db.exec("ALTER TABLE testimonials ADD COLUMN photo_url TEXT DEFAULT ''");
+  } catch {}
 }
 
 // Generate a simple unique ID

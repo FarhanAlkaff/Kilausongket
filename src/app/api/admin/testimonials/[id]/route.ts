@@ -14,7 +14,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await req.json();
-    const { name, city, role, event, rating, content, productPurchased, isActive, sortOrder } = body;
+    const { name, city, role, event, rating, content, productPurchased, source, photoUrl, isActive, sortOrder } = body;
 
     const db = getDb();
     db.prepare(`
@@ -26,6 +26,8 @@ export async function PUT(
         rating = COALESCE(?, rating),
         content = COALESCE(?, content),
         product_purchased = ?,
+        source = COALESCE(?, source),
+        photo_url = COALESCE(?, photo_url),
         is_active = COALESCE(?, is_active),
         sort_order = COALESCE(?, sort_order)
       WHERE id = ?
@@ -37,6 +39,8 @@ export async function PUT(
       rating !== undefined ? Number(rating) : null,
       content,
       productPurchased !== undefined ? productPurchased : null,
+      source !== undefined ? source : null,
+      photoUrl !== undefined ? photoUrl : null,
       isActive !== undefined ? (isActive ? 1 : 0) : null,
       sortOrder !== undefined ? Number(sortOrder) : null,
       id
