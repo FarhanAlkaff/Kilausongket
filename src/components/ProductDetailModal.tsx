@@ -63,10 +63,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             {/* Primary Large Image Preview */}
             <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-stone-100 border border-stone-200 shadow-md">
               <Image
-                src={selectedImage}
+                src={selectedImage || "/favicon.png"}
                 alt={product.name}
                 fill
-                unoptimized={selectedImage?.startsWith("data:")}
+                unoptimized={Boolean(selectedImage?.startsWith("data:") || selectedImage?.startsWith("/uploads") || selectedImage?.startsWith("/"))}
                 className="object-cover"
                 priority
               />
@@ -90,10 +90,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     }`}
                   >
                     <Image
-                      src={img}
+                      src={img || "/favicon.png"}
                       alt={`Thumbnail ${idx}`}
                       fill
-                      unoptimized={img?.startsWith("data:")}
+                      unoptimized={Boolean(img?.startsWith("data:") || img?.startsWith("/uploads") || img?.startsWith("/"))}
                       className="object-cover"
                     />
                   </button>

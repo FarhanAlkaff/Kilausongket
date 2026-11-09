@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getDb, generateId, generateSlug } from "@/lib/db";
 import { getAuthAdmin } from "@/lib/auth";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 // GET /api/admin/products
 export async function GET(req: NextRequest) {
   try {

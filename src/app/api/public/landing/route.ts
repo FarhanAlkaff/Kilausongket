@@ -4,6 +4,14 @@ import { seedDatabase } from "@/lib/seed";
 import { PRODUCTS, CATEGORIES, TESTIMONIALS, FAQS, STORE_INFO } from "@/data/products";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+const NO_CACHE_HEADERS = {
+  "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0",
+  "CDN-Cache-Control": "no-store",
+  "Vercel-CDN-Cache-Control": "no-store",
+  Pragma: "no-cache",
+};
 
 export async function GET() {
   try {
@@ -95,28 +103,34 @@ export async function GET() {
         }
       : null;
 
-    return NextResponse.json({
-      success: true,
-      data: {
-        products,
-        categories,
-        testimonials,
-        faqs,
-        storeInfo,
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          products,
+          categories,
+          testimonials,
+          faqs,
+          storeInfo,
+        },
       },
-    });
+      { headers: NO_CACHE_HEADERS }
+    );
   } catch (error: any) {
     console.error("Public landing DB fallback:", error);
-    return NextResponse.json({
-      success: true,
-      data: {
-        products: PRODUCTS,
-        categories: CATEGORIES,
-        testimonials: TESTIMONIALS,
-        faqs: FAQS,
-        storeInfo: STORE_INFO,
+    return NextResponse.json(
+      {
+        success: true,
+        data: {
+          products: PRODUCTS,
+          categories: CATEGORIES,
+          testimonials: TESTIMONIALS,
+          faqs: FAQS,
+          storeInfo: STORE_INFO,
+        },
       },
-    });
+      { headers: NO_CACHE_HEADERS }
+    );
   }
 }
 

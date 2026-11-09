@@ -21,7 +21,7 @@ export default function Home() {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState<boolean>(false);
 
-  // Dynamic state loaded from SQLite Admin Database
+  // Dynamic state loaded from SQLite Admin Database with local cache fallback
   const [products, setProducts] = useState<Product[]>(PRODUCTS);
   const [categories, setCategories] = useState<any[]>(CATEGORIES);
   const [testimonials, setTestimonials] = useState<any[]>(TESTIMONIALS);
@@ -29,33 +29,118 @@ export default function Home() {
   const [storeSettings, setStoreSettings] = useState<any>(STORE_INFO);
 
   useEffect(() => {
+    // 1. Instant hydration from client cache if available
+    try {
+      const cachedProducts = localStorage.getItem("ks_live_products");
+      if (cachedProducts) {
+        const parsed = JSON.parse(cachedProducts);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setProducts(parsed);
+        }
+      }
+      const cachedTestimonials = localStorage.getItem("ks_live_testimonials");
+      if (cachedTestimonials) {
+        const parsed = JSON.parse(cachedTestimonials);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setTestimonials(parsed);
+        }
+      }
+      const cachedSettings = localStorage.getItem("ks_live_settings");
+      if (cachedSettings) {
+        const parsed = JSON.parse(cachedSettings);
+        if (parsed) {
+          setStoreSettings(parsed);
+        }
+      }
+    } catch {}
+
+    // 2. Fetch fresh real-time data from API with strict cache-busting
     async function fetchLandingData() {
       try {
-        const res = await fetch("/api/public/landing");
+        const res = await fetch(`/api/public/landing?t=${Date.now()}`, {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+          },
+        });
         const json = await res.json();
         if (json.success && json.data) {
           if (json.data.products?.length > 0) {
             setProducts(json.data.products);
+            try {
+              localStorage.setItem("ks_live_products", JSON.stringify(json.data.products));
+            } catch {}
           }
           if (json.data.categories?.length > 0) {
             setCategories(json.data.categories);
           }
           if (json.data.testimonials?.length > 0) {
             setTestimonials(json.data.testimonials);
+            try {
+              localStorage.setItem("ks_live_testimonials", JSON.stringify(json.data.testimonials));
+            } catch {}
           }
           if (json.data.faqs?.length > 0) {
             setFaqs(json.data.faqs);
           }
           if (json.data.storeInfo) {
             setStoreSettings(json.data.storeInfo);
+            try {
+              localStorage.setItem("ks_live_settings", JSON.stringify(json.data.storeInfo));
+            } catch {}
           }
         }
       } catch (err) {
-        // Fallback to static data on network error
-        console.log("Using static data fallback");
+        console.log("Using cached or static data fallback");
       }
     }
     fetchLandingData();
+
+    // 3. Real-time broadcast channel listener (sync immediately across admin & public tabs)
+    let bc: BroadcastChannel | null = null;
+    if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+      bc = new BroadcastChannel("ks_sync");
+      bc.onmessage = (event) => {
+        if (event.data?.type === "PRODUCTS_UPDATED" && Array.isArray(event.data.products)) {
+          setProducts(event.data.products);
+        }
+        if (event.data?.type === "TESTIMONIALS_UPDATED" && Array.isArray(event.data.testimonials)) {
+          setTestimonials(event.data.testimonials);
+        }
+        if (event.data?.type === "SETTINGS_UPDATED" && event.data.settings) {
+          setStoreSettings(event.data.settings);
+        }
+      };
+    }
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "ks_live_products" && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) setProducts(parsed);
+        } catch {}
+      }
+      if (e.key === "ks_live_testimonials" && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (Array.isArray(parsed)) setTestimonials(parsed);
+        } catch {}
+      }
+      if (e.key === "ks_live_settings" && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          if (parsed) setStoreSettings(parsed);
+        } catch {}
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      if (bc) bc.close();
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   const handleSelectCategory = (categoryId: string) => {

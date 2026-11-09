@@ -256,10 +256,10 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
                     {/* Image & Badges Container */}
                     <div className="relative aspect-[4/5] bg-stone-100 overflow-hidden cursor-pointer" onClick={() => onViewProduct(product)}>
                       <Image
-                        src={product.images[0]}
+                        src={product.images?.[0] || "/favicon.png"}
                         alt={product.name}
                         fill
-                        unoptimized={product.images[0]?.startsWith("data:")}
+                        unoptimized={Boolean(product.images?.[0]?.startsWith("data:") || product.images?.[0]?.startsWith("/uploads") || product.images?.[0]?.startsWith("/"))}
                         className="object-cover group-hover:scale-106 transition-transform duration-500"
                       />
 

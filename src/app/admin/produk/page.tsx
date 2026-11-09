@@ -81,10 +81,21 @@ export default function AdminProductPage() {
   const loadProducts = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/products");
+      const res = await fetch(`/api/admin/products?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
       const data = await res.json();
-      if (data.success) {
-        setProducts(data.data || []);
+      if (data.success && Array.isArray(data.data)) {
+        setProducts(data.data);
+        try {
+          localStorage.setItem("ks_live_products", JSON.stringify(data.data));
+          if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+            const bc = new BroadcastChannel("ks_sync");
+            bc.postMessage({ type: "PRODUCTS_UPDATED", products: data.data });
+            bc.close();
+          }
+        } catch {}
       }
     } catch (err) {
       console.error(err);

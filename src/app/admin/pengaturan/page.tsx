@@ -143,6 +143,14 @@ export default function AdminSettingsPage() {
       const data = await res.json();
       if (data.success) {
         await refreshSettings();
+        try {
+          localStorage.setItem("ks_live_settings", JSON.stringify(form));
+          if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+            const bc = new BroadcastChannel("ks_sync");
+            bc.postMessage({ type: "SETTINGS_UPDATED", settings: form });
+            bc.close();
+          }
+        } catch {}
         setSuccessMessage("Pengaturan toko dan kontak berhasil disimpan!");
         setTimeout(() => setSuccessMessage(""), 4000);
       } else {

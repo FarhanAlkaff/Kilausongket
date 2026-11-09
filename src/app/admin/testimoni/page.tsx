@@ -54,10 +54,21 @@ export default function AdminTestimonialPage() {
   const loadTestimonials = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/testimonials");
+      const res = await fetch(`/api/admin/testimonials?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
       const data = await res.json();
-      if (data.success) {
-        setTestimonials(data.data || []);
+      if (data.success && Array.isArray(data.data)) {
+        setTestimonials(data.data);
+        try {
+          localStorage.setItem("ks_live_testimonials", JSON.stringify(data.data));
+          if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+            const bc = new BroadcastChannel("ks_sync");
+            bc.postMessage({ type: "TESTIMONIALS_UPDATED", testimonials: data.data });
+            bc.close();
+          }
+        } catch {}
       }
     } catch (err) {
       console.error(err);
