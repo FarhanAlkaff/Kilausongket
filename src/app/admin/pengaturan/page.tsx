@@ -15,7 +15,9 @@ import {
   AlertCircle,
   Lock,
   User,
-  ShieldCheck
+  ShieldCheck,
+  Database as DatabaseIcon,
+  RefreshCw
 } from "lucide-react";
 import { useStoreSettings } from "@/context/StoreSettingsContext";
 import ShopeeIcon from "@/components/ShopeeIcon";
@@ -53,6 +55,33 @@ export default function AdminSettingsPage() {
   const [accountSaving, setAccountSaving] = useState(false);
   const [accountSuccess, setAccountSuccess] = useState("");
   const [accountError, setAccountError] = useState("");
+
+  // Migration State
+  const [migrating, setMigrating] = useState(false);
+  const [migrateMessage, setMigrateMessage] = useState("");
+  const [migrateError, setMigrateError] = useState("");
+
+  const handleMigrate = async () => {
+    if (!confirm("Apakah Anda yakin ingin memigrasikan seluruh data produk, testimoni, FAQ, dan pengaturan toko ke Cloud Database Neon?")) {
+      return;
+    }
+    setMigrating(true);
+    setMigrateMessage("");
+    setMigrateError("");
+    try {
+      const res = await fetch("/api/admin/migrate", { method: "POST" });
+      const data = await res.json();
+      if (data.success) {
+        setMigrateMessage(data.message || "Migrasi data ke Neon Postgres berhasil!");
+      } else {
+        setMigrateError(data.error || "Gagal melakukan migrasi.");
+      }
+    } catch {
+      setMigrateError("Terjadi kesalahan jaringan.");
+    } finally {
+      setMigrating(false);
+    }
+  };
 
   useEffect(() => {
     async function loadSettings() {
@@ -582,6 +611,54 @@ export default function AdminSettingsPage() {
             </button>
           </div>
         </form>
+      </div>
+
+      {/* Section Cloud Database & Migrasi */}
+      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200/80 shadow-sm space-y-5 mt-6">
+        <div className="border-b border-stone-100 pb-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-forest/10 flex items-center justify-center text-forest">
+              <DatabaseIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-charcoal">Cloud Database & Migrasi Neon Postgres</h3>
+              <p className="text-xs text-stone-500">Migrasikan dan sinkronkan seluruh data katalog, ulasan & kontak ke database cloud</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleMigrate}
+            disabled={migrating}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-sm transition disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 ${migrating ? "animate-spin" : ""}`} />
+            <span>{migrating ? "Memigrasikan Data..." : "Migrasikan Semua Data Sekarang (1-Klik)"}</span>
+          </button>
+        </div>
+
+        {migrateMessage && (
+          <div className="p-3 bg-emerald-50 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2 border border-emerald-200">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+            <span>{migrateMessage}</span>
+          </div>
+        )}
+
+        {migrateError && (
+          <div className="p-3 bg-red-50 text-red-700 rounded-xl text-xs font-semibold flex items-center gap-2 border border-red-200">
+            <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+            <span>{migrateError}</span>
+          </div>
+        )}
+
+        <div className="p-4 bg-stone-50 rounded-xl border border-stone-200/60 text-xs text-stone-600 space-y-1.5">
+          <p className="font-semibold text-charcoal">ℹ️ Informasi Migrasi:</p>
+          <ul className="list-disc list-inside space-y-1 text-stone-500">
+            <li>Membuat seluruh tabel di schema <code className="bg-stone-200 px-1 py-0.5 rounded text-stone-800">public</code> pada Neon Postgres.</li>
+            <li>Mengunggah 8 produk katalog songket, 4 kategori, 4 ulasan testimoni, dan pengaturan nomor WhatsApp/Shopee resmi.</li>
+            <li>Setelah migrasi, data produk yang Anda edit akan otomatis tersimpan permanen di cloud dan bisa diakses oleh pengunjung dari seluruh dunia.</li>
+          </ul>
+        </div>
       </div>
     </div>
   );

@@ -270,3 +270,4 @@ export async function initPostgres(): Promise<void> {
     console.error("Postgres initialization warning:", error);
   }
 }
+
