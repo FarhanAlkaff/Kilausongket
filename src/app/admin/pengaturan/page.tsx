@@ -12,7 +12,10 @@ import {
   Sparkles,
   Save,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Lock,
+  User,
+  ShieldCheck
 } from "lucide-react";
 import { useStoreSettings } from "@/context/StoreSettingsContext";
 import ShopeeIcon from "@/components/ShopeeIcon";
@@ -42,6 +45,15 @@ export default function AdminSettingsPage() {
     aboutText: "",
   });
 
+  // Admin Account & Password State
+  const [adminProfile, setAdminProfile] = useState({ username: "admin", name: "Administrator" });
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [accountSaving, setAccountSaving] = useState(false);
+  const [accountSuccess, setAccountSuccess] = useState("");
+  const [accountError, setAccountError] = useState("");
+
   useEffect(() => {
     async function loadSettings() {
       try {
@@ -49,6 +61,15 @@ export default function AdminSettingsPage() {
         const data = await res.json();
         if (data.success && data.data) {
           setForm((prev) => ({ ...prev, ...data.data }));
+        }
+
+        const authRes = await fetch("/api/admin/auth");
+        const authData = await authRes.json();
+        if (authData.success && authData.data) {
+          setAdminProfile({
+            username: authData.data.username || "admin",
+            name: authData.data.name || "Administrator",
+          });
         }
       } catch (err) {
         console.error(err);
@@ -62,6 +83,49 @@ export default function AdminSettingsPage() {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAccountSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAccountError("");
+    setAccountSuccess("");
+
+    if (newPassword && newPassword !== confirmPassword) {
+      setAccountError("Konfirmasi password baru tidak cocok.");
+      return;
+    }
+    if (newPassword && newPassword.length < 6) {
+      setAccountError("Password baru minimal 6 karakter.");
+      return;
+    }
+
+    setAccountSaving(true);
+    try {
+      const res = await fetch("/api/admin/auth", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          newName: adminProfile.name,
+          newUsername: adminProfile.username,
+          currentPassword: currentPassword || undefined,
+          newPassword: newPassword || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setAccountSuccess(data.message || "Kredensial admin berhasil diperbarui!");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+        setTimeout(() => setAccountSuccess(""), 4000);
+      } else {
+        setAccountError(data.error || "Gagal memperbarui kredensial");
+      }
+    } catch {
+      setAccountError("Terjadi kesalahan jaringan.");
+    } finally {
+      setAccountSaving(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -382,6 +446,135 @@ export default function AdminSettingsPage() {
           </button>
         </div>
       </form>
+
+      {/* Section Keamanan & Akun Admin */}
+      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-stone-200/80 shadow-sm space-y-5 mt-6">
+        <div className="border-b border-stone-100 pb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <ShieldCheck className="w-5 h-5 text-forest" />
+            <div>
+              <h3 className="text-sm font-bold text-charcoal">Keamanan Akun & Kredensial Admin</h3>
+              <p className="text-xs text-stone-500">Ubah username dan password untuk mengamankan panel admin saat online</p>
+            </div>
+          </div>
+        </div>
+
+        {accountSuccess && (
+          <div className="p-3 bg-emerald-50 text-emerald-800 rounded-xl text-xs font-semibold flex items-center gap-2 border border-emerald-200">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            {accountSuccess}
+          </div>
+        )}
+
+        {accountError && (
+          <div className="p-3 bg-red-50 text-red-800 rounded-xl text-xs font-semibold flex items-center gap-2 border border-red-200">
+            <AlertCircle className="w-4 h-4 text-red-600" />
+            {accountError}
+          </div>
+        )}
+
+        <form onSubmit={handleAccountSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div>
+              <label className="block font-semibold text-stone-700 mb-1">
+                Nama Tampilan Admin
+              </label>
+              <div className="relative">
+                <User className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  value={adminProfile.name}
+                  onChange={(e) => setAdminProfile({ ...adminProfile, name: e.target.value })}
+                  placeholder="Administrator"
+                  className="w-full pl-9 pr-3.5 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-semibold text-stone-700 mb-1">
+                Username Login *
+              </label>
+              <div className="relative">
+                <User className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="text"
+                  required
+                  value={adminProfile.username}
+                  onChange={(e) => setAdminProfile({ ...adminProfile, username: e.target.value })}
+                  placeholder="admin"
+                  className="w-full pl-9 pr-3.5 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest"
+                />
+              </div>
+            </div>
+
+            <div className="sm:col-span-2 pt-2 border-t border-stone-100">
+              <p className="text-[11px] text-stone-500 font-medium mb-3">
+                * Kosongkan kolom password di bawah jika Anda hanya ingin memperbarui nama / username.
+              </p>
+            </div>
+
+            <div>
+              <label className="block font-semibold text-stone-700 mb-1">
+                Password Saat Ini
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="Masukkan password saat ini"
+                  className="w-full pl-9 pr-3.5 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-semibold text-stone-700 mb-1">
+                Password Baru (Minimal 6 karakter)
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Buat password baru yang aman"
+                  className="w-full pl-9 pr-3.5 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest"
+                />
+              </div>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block font-semibold text-stone-700 mb-1">
+                Konfirmasi Password Baru
+              </label>
+              <div className="relative">
+                <Lock className="w-4 h-4 text-stone-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Ulangi password baru"
+                  className="w-full pl-9 pr-3.5 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="submit"
+              disabled={accountSaving}
+              className="flex items-center gap-2 px-5 py-2.5 bg-forest hover:bg-forest-light text-white font-bold text-xs rounded-xl shadow-sm transition disabled:opacity-50"
+            >
+              <Lock className="w-4 h-4 text-gold-light" />
+              <span>{accountSaving ? "Menyimpan..." : "Perbarui Akun & Password"}</span>
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

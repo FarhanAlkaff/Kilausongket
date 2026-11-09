@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { PRODUCTS } from "@/data/products";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://kilausongket.com";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://kilausongket.com";
 
   const productEntries: MetadataRoute.Sitemap = PRODUCTS.map((p) => ({
     url: `${baseUrl}/produk/${p.id}`,
