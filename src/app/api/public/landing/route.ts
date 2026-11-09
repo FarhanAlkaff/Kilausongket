@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/db";
 import { seedDatabase } from "@/lib/seed";
+import { PRODUCTS, CATEGORIES, TESTIMONIALS, FAQS, STORE_INFO } from "@/data/products";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    seedDatabase();
+    try {
+      seedDatabase();
+    } catch {}
     const db = getDb();
 
     // Products
@@ -103,7 +106,17 @@ export async function GET() {
       },
     });
   } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    console.error("Public landing DB fallback:", error);
+    return NextResponse.json({
+      success: true,
+      data: {
+        products: PRODUCTS,
+        categories: CATEGORIES,
+        testimonials: TESTIMONIALS,
+        faqs: FAQS,
+        storeInfo: STORE_INFO,
+      },
+    });
   }
 }
 

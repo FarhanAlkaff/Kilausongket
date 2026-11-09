@@ -6,11 +6,22 @@ let db: Database.Database;
 
 export function getDb(): Database.Database {
   if (!db) {
-    const prismaDir = path.join(process.cwd(), "prisma");
-    if (!fs.existsSync(prismaDir)) {
-      fs.mkdirSync(prismaDir, { recursive: true });
+    const isVercel = Boolean(process.env.VERCEL) || (process.env.NODE_ENV === "production" && !fs.existsSync(path.join(process.cwd(), "prisma", "dev.db")));
+    let DB_PATH: string;
+
+    if (isVercel) {
+      DB_PATH = path.join("/tmp", "dev.db");
+    } else {
+      try {
+        const prismaDir = path.join(process.cwd(), "prisma");
+        if (!fs.existsSync(prismaDir)) {
+          fs.mkdirSync(prismaDir, { recursive: true });
+        }
+        DB_PATH = path.join(prismaDir, "dev.db");
+      } catch {
+        DB_PATH = path.join("/tmp", "dev.db");
+      }
     }
-    const DB_PATH = path.join(prismaDir, "dev.db");
 
     db = new Database(DB_PATH, { timeout: 5000 });
     db.pragma("journal_mode = DELETE");

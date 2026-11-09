@@ -6,7 +6,9 @@ import { seedDatabase } from "@/lib/seed";
 // GET /api/admin/auth - Check auth status
 export async function GET() {
   try {
-    seedDatabase(); // Ensure DB is seeded
+    try {
+      seedDatabase();
+    } catch {}
     const admin = await getAuthAdmin();
     if (!admin) {
       return NextResponse.json({ success: false, error: "Not authenticated" }, { status: 401 });
