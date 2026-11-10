@@ -35,38 +35,15 @@ export default function Home() {
   }, [products, selectedProductId]);
 
   useEffect(() => {
-    // Helper to merge overrides
-    const applyOverrides = (list: any[]) => {
-      try {
-        const overrides = JSON.parse(localStorage.getItem("ks_product_overrides") || "{}");
-        if (Object.keys(overrides).length > 0) {
-          return list.map((p) => {
-            const override = overrides[p.id] || overrides[p.slug];
-            if (override) {
-              if (override.updatedAt && p.updatedAt) {
-                const overrideTime = new Date(override.updatedAt).getTime();
-                const serverTime = new Date(p.updatedAt).getTime();
-                if (serverTime >= overrideTime) return p;
-              }
-              return { ...p, ...override };
-            }
-            return p;
-          });
-        }
-      } catch {}
-      return list;
-    };
-
     // 1. Instant hydration from client cache if available
     try {
+      localStorage.removeItem("ks_product_overrides");
       const cachedProducts = localStorage.getItem("ks_live_products");
       if (cachedProducts) {
         const parsed = JSON.parse(cachedProducts);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setProducts(applyOverrides(parsed));
+          setProducts(parsed);
         }
-      } else {
-        setProducts(applyOverrides(PRODUCTS));
       }
       const cachedTestimonials = localStorage.getItem("ks_live_testimonials");
       if (cachedTestimonials) {
@@ -97,10 +74,10 @@ export default function Home() {
         const json = await res.json();
         if (json.success && json.data) {
           if (json.data.products?.length > 0) {
-            const finalProducts = applyOverrides(json.data.products);
-            setProducts(finalProducts);
+            setProducts(json.data.products);
             try {
-              localStorage.setItem("ks_live_products", JSON.stringify(finalProducts));
+              localStorage.setItem("ks_live_products", JSON.stringify(json.data.products));
+              localStorage.removeItem("ks_product_overrides");
             } catch {}
           }
           if (json.data.categories?.length > 0) {

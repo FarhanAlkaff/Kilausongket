@@ -263,28 +263,24 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
           <StaggerContainer staggerDelay={0.08} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {filteredProducts.map((product) => {
               const waUrl = getWhatsAppProductUrl(product.name);
+              const thumbUrl = getProductThumbnail(product.images);
 
               return (
-                <StaggerItem key={product.id}>
+                <StaggerItem key={`${product.id}-${thumbUrl}`}>
                   <motion.div
                     whileHover={{ y: -6, transition: { duration: 0.25 } }}
                     className="group bg-white rounded-2xl overflow-hidden border border-stone-200/90 shadow-sm hover:shadow-xl hover:border-gold/50 transition-all duration-300 flex flex-col justify-between h-full"
                   >
                     {/* Image & Badges Container */}
                     <div className="relative aspect-[4/5] bg-stone-100 overflow-hidden cursor-pointer" onClick={() => onViewProduct(product)}>
-                      {(() => {
-                        const thumbUrl = getProductThumbnail(product.images);
-                        return (
-                          <Image
-                            key={thumbUrl}
-                            src={thumbUrl}
-                            alt={product.name}
-                            fill
-                            unoptimized={Boolean(thumbUrl.startsWith("data:") || thumbUrl.startsWith("/uploads") || thumbUrl.startsWith("/"))}
-                            className="object-cover group-hover:scale-106 transition-transform duration-500"
-                          />
-                        );
-                      })()}
+                      <Image
+                        key={thumbUrl}
+                        src={thumbUrl}
+                        alt={product.name}
+                        fill
+                        unoptimized={Boolean(thumbUrl.startsWith("data:") || thumbUrl.startsWith("/uploads") || thumbUrl.startsWith("/"))}
+                        className="object-cover group-hover:scale-106 transition-transform duration-500"
+                      />
 
                       {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

@@ -90,22 +90,13 @@ export default function AdminProductPage() {
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
-        // Merge with local overrides so admin edits are never lost
-        let merged = data.data;
+        setProducts(data.data);
         try {
-          const overrides = JSON.parse(localStorage.getItem("ks_product_overrides") || "{}");
-          merged = merged.map((p: Product) => {
-            const override = overrides[p.id] || overrides[p.slug];
-            return override ? { ...p, ...override } : p;
-          });
-        } catch {}
-
-        setProducts(merged);
-        try {
-          localStorage.setItem("ks_live_products", JSON.stringify(merged));
+          localStorage.setItem("ks_live_products", JSON.stringify(data.data));
+          localStorage.removeItem("ks_product_overrides");
           if (typeof window !== "undefined" && "BroadcastChannel" in window) {
             const bc = new BroadcastChannel("ks_sync");
-            bc.postMessage({ type: "PRODUCTS_UPDATED", products: merged });
+            bc.postMessage({ type: "PRODUCTS_UPDATED", products: data.data });
             bc.close();
           }
         } catch {}
@@ -291,15 +282,10 @@ export default function AdminProductPage() {
         );
         setProducts(updatedList);
 
-        // Save persistent override so it syncs across tabs instantly
+        // Save live products and clear overrides so database data is always strictly followed
         try {
           localStorage.setItem("ks_live_products", JSON.stringify(updatedList));
-          const overrides = JSON.parse(localStorage.getItem("ks_product_overrides") || "{}");
-          if (currentId) overrides[currentId] = payload;
-          const matched = products.find((p) => p.id === currentId || ((p as any).slug && (p as any).slug === currentId));
-          if (matched?.id) overrides[matched.id] = payload;
-          if ((matched as any)?.slug) overrides[(matched as any).slug] = payload;
-          localStorage.setItem("ks_product_overrides", JSON.stringify(overrides));
+          localStorage.removeItem("ks_product_overrides");
 
           if (typeof window !== "undefined" && "BroadcastChannel" in window) {
             const bc = new BroadcastChannel("ks_sync");

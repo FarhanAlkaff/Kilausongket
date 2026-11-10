@@ -58,6 +58,8 @@ export async function GET() {
       soldCount: row.sold_count,
       shopeeUrl: row.shopee_url,
       sortOrder: row.sort_order,
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
     }));
 
     // Categories with count
