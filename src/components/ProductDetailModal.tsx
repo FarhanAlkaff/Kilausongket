@@ -57,6 +57,37 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const [selectedSize, setSelectedSize] = useState<string>(product.availableSizes?.[0] || "");
   const [selectedColor, setSelectedColor] = useState<string>(product.colors?.[0] || "");
 
+  const guaranteesList = useMemo<{ title: string; desc: string }[]>(() => {
+    let raw: any = (product as any)?.guarantees;
+    if (typeof raw === "string") {
+      try {
+        raw = JSON.parse(raw);
+      } catch {
+        raw = [];
+      }
+    }
+    if (Array.isArray(raw) && raw.length > 0) {
+      const valid = raw.filter((item: any) => item && (item.title || item.desc));
+      if (valid.length > 0) return valid;
+    }
+
+    const isAnak = product.category === "anak";
+    return [
+      {
+        title: "Furing Anti-Gatal",
+        desc: product.furing || (isAnak ? "Nyaman untuk kulit sensitif anak." : "Dingin, halus & nyaman berjam-jam.")
+      },
+      {
+        title: "Garansi Tukar Ukuran",
+        desc: "Bisa retur jika ukuran tidak cocok."
+      },
+      {
+        title: "Pengiriman Cepat",
+        desc: "J&T, SiCepat, JNE seluruh Indonesia."
+      }
+    ];
+  }, [product?.id, product?.furing, product?.category, (product as any)?.guarantees]);
+
   // Reset index when product changes or images list length changes
   useEffect(() => {
     setSelectedImageIndex(0);
@@ -215,19 +246,19 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             )}
 
             {/* Guarantees Box */}
-            <div className="bg-ivory-warm p-4 rounded-2xl border border-stone-200 text-xs space-y-2 text-charcoal">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                <span><strong>Furing Anti-Gatal:</strong> Nyaman untuk kulit sensitif anak.</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <RotateCcw className="w-4 h-4 text-gold-dark flex-shrink-0" />
-                <span><strong>Garansi Tukar Ukuran:</strong> Bisa retur jika ukuran tidak cocok.</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Truck className="w-4 h-4 text-forest flex-shrink-0" />
-                <span><strong>Pengiriman Cepat:</strong> J&T, SiCepat, JNE seluruh Indonesia.</span>
-              </div>
+            <div className="bg-ivory-warm p-4 rounded-2xl border border-stone-200 text-xs space-y-2.5 text-charcoal">
+              {guaranteesList.map((g, idx) => (
+                <div key={idx} className="flex items-start gap-2">
+                  {idx === 0 ? (
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  ) : idx === 1 ? (
+                    <RotateCcw className="w-4 h-4 text-gold-dark flex-shrink-0 mt-0.5" />
+                  ) : (
+                    <Truck className="w-4 h-4 text-forest flex-shrink-0 mt-0.5" />
+                  )}
+                  <span className="leading-relaxed"><strong>{g.title}:</strong> {g.desc}</span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -351,14 +382,16 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               </div>
 
               {/* Specifications */}
-              <div className="grid grid-cols-2 gap-2 text-xs pt-1">
-                {product.specs.map((spec, i) => (
-                  <div key={i} className="bg-stone-50 p-2.5 rounded-xl border border-stone-200">
-                    <span className="text-stone-400 block text-[10px] uppercase font-semibold">{spec.label}</span>
-                    <span className="font-medium text-stone-800">{spec.value}</span>
-                  </div>
-                ))}
-              </div>
+              {Array.isArray(product.specs) && product.specs.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-1">
+                  {product.specs.map((spec, i) => (
+                    <div key={i} className="bg-stone-50 p-2.5 rounded-xl border border-stone-200 shadow-sm">
+                      <span className="text-stone-400 block text-[10px] uppercase font-bold tracking-wider mb-0.5">{spec.label}</span>
+                      <span className="font-semibold text-stone-800 leading-snug">{spec.value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Action Buttons (Shopee & WhatsApp Integration) */}

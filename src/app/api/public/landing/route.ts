@@ -48,6 +48,7 @@ export async function GET() {
       availableSizes: JSON.parse(row.available_sizes || "[]"),
       colors: JSON.parse(row.colors || "[]"),
       specs: JSON.parse(row.specs || "[]"),
+      guarantees: JSON.parse(row.guarantees || "[]"),
       subCategory: row.sub_category,
       categoryLabel: row.category_label,
       originalPrice: row.original_price,

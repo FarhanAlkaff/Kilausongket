@@ -42,6 +42,7 @@ interface Product {
   isActive: boolean;
   description: string;
   specs: { label: string; value: string }[];
+  guarantees?: { title: string; desc: string }[];
   shopeeUrl: string;
 }
 
@@ -78,6 +79,12 @@ export default function AdminProductPage() {
   const [formIsActive, setFormIsActive] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
+  const [formSpecs, setFormSpecs] = useState<{ label: string; value: string }[]>([]);
+  const [formGuarantees, setFormGuarantees] = useState<{ title: string; desc: string }[]>([
+    { title: "Furing Anti-Gatal", desc: "Nyaman untuk kulit sensitif, dingin & anti-gerah" },
+    { title: "Garansi Tukar Ukuran", desc: "Bisa retur jika ukuran tidak cocok" },
+    { title: "Pengiriman Cepat", desc: "J&T, SiCepat, JNE seluruh Indonesia" },
+  ]);
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -133,6 +140,15 @@ export default function AdminProductPage() {
     setFormIsBestSeller(false);
     setFormIsNew(true);
     setFormIsActive(true);
+    setFormSpecs([
+      { label: "Paket Termasuk", value: "Baju Atasan Songket, Celana Senada, Tanjak Cilik" },
+      { label: "Bahan Furing", value: "Katun Silky Premium Adem" }
+    ]);
+    setFormGuarantees([
+      { title: "Furing Anti-Gatal", desc: "Nyaman untuk kulit sensitif, dingin & anti-gerah" },
+      { title: "Garansi Tukar Ukuran", desc: "Bisa retur jika ukuran tidak cocok" },
+      { title: "Pengiriman Cepat", desc: "J&T, SiCepat, JNE seluruh Indonesia" }
+    ]);
     setErrorMessage("");
     setIsModalOpen(true);
   };
@@ -153,6 +169,26 @@ export default function AdminProductPage() {
     setFormSizes((p.availableSizes || []).join(", "));
     setFormColors((p.colors || []).join(", "));
     setFormDescription(p.description || "");
+    setFormSpecs(
+      Array.isArray(p.specs) && p.specs.length > 0
+        ? p.specs.map((s) => ({ label: s.label || "", value: s.value || "" }))
+        : [
+            { label: "Paket Termasuk", value: "" },
+            { label: "Bahan Furing", value: "" }
+          ]
+    );
+    setFormGuarantees(
+      Array.isArray((p as any).guarantees) && (p as any).guarantees.length > 0
+        ? (p as any).guarantees.map((g: any) => ({ title: g.title || "", desc: g.desc || "" }))
+        : [
+            {
+              title: "Furing Anti-Gatal",
+              desc: p.furing || (p.category === "anak" ? "Nyaman untuk kulit sensitif anak." : "Dingin, halus & nyaman berjam-jam.")
+            },
+            { title: "Garansi Tukar Ukuran", desc: "Bisa retur jika ukuran tidak cocok." },
+            { title: "Pengiriman Cepat", desc: "J&T, SiCepat, JNE seluruh Indonesia." }
+          ]
+    );
     setFormShopeeUrl(p.shopeeUrl || "");
     setFormIsFeatured(Boolean(p.isFeatured));
     setFormIsBestSeller(Boolean(p.isBestSeller));
@@ -214,6 +250,38 @@ export default function AdminProductPage() {
     moveImage(index, 0);
   };
 
+  const addSpec = () => {
+    setFormSpecs((prev) => [...prev, { label: "", value: "" }]);
+  };
+
+  const updateSpec = (index: number, key: "label" | "value", value: string) => {
+    setFormSpecs((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [key]: value };
+      return next;
+    });
+  };
+
+  const removeSpec = (index: number) => {
+    setFormSpecs((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const addGuarantee = () => {
+    setFormGuarantees((prev) => [...prev, { title: "", desc: "" }]);
+  };
+
+  const updateGuarantee = (index: number, key: "title" | "desc", value: string) => {
+    setFormGuarantees((prev) => {
+      const next = [...prev];
+      next[index] = { ...next[index], [key]: value };
+      return next;
+    });
+  };
+
+  const removeGuarantee = (index: number) => {
+    setFormGuarantees((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
@@ -250,6 +318,8 @@ export default function AdminProductPage() {
       availableSizes: sizesArray,
       colors: colorsArray,
       description: formDescription,
+      specs: formSpecs.filter((s) => s.label.trim() || s.value.trim()),
+      guarantees: formGuarantees.filter((g) => g.title.trim() || g.desc.trim()),
       shopeeUrl: formShopeeUrl,
       isFeatured: formIsFeatured,
       isBestSeller: formIsBestSeller,
@@ -879,6 +949,61 @@ export default function AdminProductPage() {
                 </div>
               </div>
 
+              {/* Kartu Keunggulan & Garansi (Di Bawah Foto pada Modal Website) */}
+              <div className="bg-emerald-50/50 p-4 rounded-2xl border border-emerald-100">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <label className="block font-semibold text-emerald-950 text-xs">
+                      Kartu Keunggulan &amp; Garansi (Di Bawah Foto Detail Produk)
+                    </label>
+                    <p className="text-[11px] text-emerald-700/80">
+                      Tampil di kotak keunggulan di bawah foto produk pada popup detail website.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addGuarantee}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-white border border-emerald-300 hover:bg-emerald-100 px-2.5 py-1 rounded-lg transition shadow-sm"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Tambah Baris
+                  </button>
+                </div>
+
+                <div className="space-y-2 mt-2">
+                  {formGuarantees.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-2 bg-white p-2 rounded-xl border border-emerald-100 shadow-sm">
+                      <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold text-[10px] flex-shrink-0">
+                        {idx + 1}
+                      </div>
+                      <input
+                        type="text"
+                        value={item.title}
+                        onChange={(e) => updateGuarantee(idx, "title", e.target.value)}
+                        placeholder="Judul (Contoh: Furing Anti-Gatal)"
+                        className="w-1/3 px-2.5 py-1.5 border border-stone-200 rounded-lg text-xs font-semibold focus:border-forest focus:outline-none"
+                      />
+                      <input
+                        type="text"
+                        value={item.desc}
+                        onChange={(e) => updateGuarantee(idx, "desc", e.target.value)}
+                        placeholder="Keterangan (Contoh: Nyaman untuk kulit sensitif...)"
+                        className="flex-1 px-2.5 py-1.5 border border-stone-200 rounded-lg text-xs focus:border-forest focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeGuarantee(idx)}
+                        disabled={formGuarantees.length <= 1}
+                        className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg disabled:opacity-20 transition"
+                        title="Hapus"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
               {/* Shopee URL */}
               <div>
                 <label className="block font-semibold text-stone-700 mb-1">
@@ -910,6 +1035,62 @@ export default function AdminProductPage() {
                   placeholder="Jelaskan kenyamanan furing katun, keunggulan motif, dan kecocokan untuk acara apa..."
                   className="w-full px-3.5 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest"
                 />
+              </div>
+
+              {/* Kartu Spesifikasi & Kelengkapan (Di Bawah Deskripsi) */}
+              <div className="bg-stone-50 p-4 rounded-2xl border border-stone-200">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <label className="block font-semibold text-stone-800 text-xs">
+                      Kartu Spesifikasi &amp; Kelengkapan (Di Bawah Deskripsi)
+                    </label>
+                    <p className="text-[11px] text-stone-500">
+                      Kotak informasi di bawah deskripsi, contoh: KELENGKAPAN, KAIN SAMPIN, UKURAN TANJAK, dll.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={addSpec}
+                    className="inline-flex items-center gap-1 text-[11px] font-bold text-forest bg-white border border-stone-300 hover:bg-stone-100 px-2.5 py-1 rounded-lg transition shadow-sm"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    Tambah Kartu
+                  </button>
+                </div>
+
+                <div className="space-y-2 mt-2">
+                  {formSpecs.map((spec, idx) => (
+                    <div key={idx} className="flex items-center gap-2 bg-white p-2 rounded-xl border border-stone-200 shadow-sm">
+                      <input
+                        type="text"
+                        value={spec.label}
+                        onChange={(e) => updateSpec(idx, "label", e.target.value)}
+                        placeholder="Label (Contoh: KELENGKAPAN)"
+                        className="w-1/3 px-2.5 py-1.5 border border-stone-200 rounded-lg text-xs font-bold uppercase focus:border-forest focus:outline-none"
+                      />
+                      <input
+                        type="text"
+                        value={spec.value}
+                        onChange={(e) => updateSpec(idx, "value", e.target.value)}
+                        placeholder="Nilai / Isi (Contoh: Jas Beskap, Rantai Hiasan)"
+                        className="flex-1 px-2.5 py-1.5 border border-stone-200 rounded-lg text-xs focus:border-forest focus:outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => removeSpec(idx)}
+                        className="p-1.5 text-stone-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+                        title="Hapus Kartu"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                  {formSpecs.length === 0 && (
+                    <div className="text-center py-3 text-stone-400 text-xs italic bg-white rounded-xl border border-dashed border-stone-200">
+                      Belum ada kartu spesifikasi. Klik tombol &ldquo;+ Tambah Kartu&rdquo; di atas.
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Badges / Checkboxes */}

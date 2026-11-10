@@ -65,11 +65,15 @@ function initializeDatabase(db: Database.Database) {
       sold_count INTEGER DEFAULT 0,
       description TEXT DEFAULT '',
       specs TEXT DEFAULT '[]',
+      guarantees TEXT DEFAULT '[]',
       shopee_url TEXT DEFAULT '',
       sort_order INTEGER DEFAULT 0,
       created_at TEXT DEFAULT (datetime('now')),
       updated_at TEXT DEFAULT (datetime('now'))
     );
+    try {
+      db.exec("ALTER TABLE products ADD COLUMN guarantees TEXT DEFAULT '[]'");
+    } catch {}
 
     CREATE TABLE IF NOT EXISTS categories (
       id TEXT PRIMARY KEY,

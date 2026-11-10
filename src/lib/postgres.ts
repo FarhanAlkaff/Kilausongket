@@ -58,12 +58,17 @@ export async function initPostgres(): Promise<void> {
         sold_count INTEGER DEFAULT 0,
         description TEXT DEFAULT '',
         specs TEXT DEFAULT '[]',
+        guarantees TEXT DEFAULT '[]',
         shopee_url TEXT DEFAULT '',
         sort_order INTEGER DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `;
+
+    try {
+      await sql`ALTER TABLE products ADD COLUMN IF NOT EXISTS guarantees TEXT DEFAULT '[]'`;
+    } catch {}
 
     // 3. Create Categories Table
     await sql`

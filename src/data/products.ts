@@ -22,6 +22,10 @@ export interface Product {
     label: string;
     value: string;
   }[];
+  guarantees?: {
+    title: string;
+    desc: string;
+  }[];
   shopeeUrl: string;
 }
 
