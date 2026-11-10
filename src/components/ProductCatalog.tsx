@@ -85,7 +85,7 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
       if (sortBy === "bestseller") return b.soldCount - a.soldCount;
       return (b.isFeatured ? 1 : 0) - (a.isFeatured ? 1 : 0);
     });
-  }, [selectedCategory, subFilter, searchQuery, sortBy]);
+  }, [products, selectedCategory, subFilter, searchQuery, sortBy]);
 
   return (
     <section id="katalog" className="py-16 sm:py-24 bg-white relative overflow-hidden">
@@ -276,6 +276,7 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
                         const thumbUrl = getProductThumbnail(product.images);
                         return (
                           <Image
+                            key={thumbUrl}
                             src={thumbUrl}
                             alt={product.name}
                             fill
