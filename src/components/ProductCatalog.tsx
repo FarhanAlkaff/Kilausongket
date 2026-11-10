@@ -27,6 +27,23 @@ interface ProductCatalogProps {
   categories?: any[];
 }
 
+const getProductThumbnail = (images: any): string => {
+  if (Array.isArray(images) && images.length > 0) {
+    const first = images[0];
+    if (typeof first === "string" && first.trim().length > 0) return first;
+  }
+  if (typeof images === "string") {
+    try {
+      const parsed = JSON.parse(images);
+      if (Array.isArray(parsed) && parsed.length > 0 && typeof parsed[0] === "string") {
+        return parsed[0];
+      }
+    } catch {}
+    if (images.startsWith("/") || images.startsWith("http") || images.startsWith("data:")) return images;
+  }
+  return "/images/logo.jpg";
+};
+
 export const ProductCatalog: React.FC<ProductCatalogProps> = ({
   selectedCategory,
   onSelectCategory,
@@ -255,13 +272,18 @@ export const ProductCatalog: React.FC<ProductCatalogProps> = ({
                   >
                     {/* Image & Badges Container */}
                     <div className="relative aspect-[4/5] bg-stone-100 overflow-hidden cursor-pointer" onClick={() => onViewProduct(product)}>
-                      <Image
-                        src={product.images?.[0] || "/favicon.png"}
-                        alt={product.name}
-                        fill
-                        unoptimized={Boolean(product.images?.[0]?.startsWith("data:") || product.images?.[0]?.startsWith("/uploads") || product.images?.[0]?.startsWith("/"))}
-                        className="object-cover group-hover:scale-106 transition-transform duration-500"
-                      />
+                      {(() => {
+                        const thumbUrl = getProductThumbnail(product.images);
+                        return (
+                          <Image
+                            src={thumbUrl}
+                            alt={product.name}
+                            fill
+                            unoptimized={Boolean(thumbUrl.startsWith("data:") || thumbUrl.startsWith("/uploads") || thumbUrl.startsWith("/"))}
+                            className="object-cover group-hover:scale-106 transition-transform duration-500"
+                          />
+                        );
+                      })()}
 
                       {/* Gradient Overlay */}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

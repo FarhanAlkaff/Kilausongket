@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { 
   X, 
@@ -13,7 +13,9 @@ import {
   ShieldCheck, 
   Truck, 
   RotateCcw,
-  ExternalLink
+  ExternalLink,
+  ChevronLeft,
+  ChevronRight
 } from "lucide-react";
 import { Product, formatRupiah, STORE_INFO } from "@/data/products";
 import { useStoreSettings } from "@/context/StoreSettingsContext";
@@ -33,21 +35,48 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const { settings, getWhatsAppProductUrl } = useStoreSettings();
   if (!product) return null;
 
-  const [selectedImage, setSelectedImage] = useState(product.images[0] || "/favicon.png");
-  const [selectedSize, setSelectedSize] = useState(product.availableSizes[0] || "");
-  const [selectedColor, setSelectedColor] = useState(product.colors[0] || "");
-
-  useEffect(() => {
-    if (product && Array.isArray(product.images) && product.images.length > 0) {
-      setSelectedImage(product.images[0]);
+  // Safely extract all image URLs as an array
+  const productImages = useMemo<string[]>(() => {
+    if (!product) return ["/favicon.png"];
+    let raw: any = product.images;
+    if (typeof raw === "string") {
+      try {
+        raw = JSON.parse(raw);
+      } catch {
+        raw = [raw];
+      }
     }
+    if (Array.isArray(raw)) {
+      const filtered = raw.filter((item): item is string => typeof item === "string" && item.trim().length > 0);
+      if (filtered.length > 0) return filtered;
+    }
+    return ["/images/logo.jpg"];
+  }, [product?.id, product?.images]);
+
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+  const [selectedSize, setSelectedSize] = useState<string>(product.availableSizes?.[0] || "");
+  const [selectedColor, setSelectedColor] = useState<string>(product.colors?.[0] || "");
+
+  // Reset index when product changes or images list length changes
+  useEffect(() => {
+    setSelectedImageIndex(0);
     if (product && Array.isArray(product.availableSizes) && product.availableSizes.length > 0) {
       setSelectedSize(product.availableSizes[0]);
     }
     if (product && Array.isArray(product.colors) && product.colors.length > 0) {
       setSelectedColor(product.colors[0]);
     }
-  }, [product]);
+  }, [product?.id, productImages.length]);
+
+  const currentImage = productImages[selectedImageIndex] || productImages[0] || "/favicon.png";
+
+  const handlePrevImage = () => {
+    setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : productImages.length - 1));
+  };
+
+  const handleNextImage = () => {
+    setSelectedImageIndex((prev) => (prev < productImages.length - 1 ? prev + 1 : 0));
+  };
 
   const dynamicWaUrl = getWhatsAppProductUrl(product.name, `${selectedSize} - Warna: ${selectedColor}`);
   const shopeeLink = product.shopeeUrl || settings.shopeeUrl || STORE_INFO.shopeeUrl;
@@ -73,15 +102,41 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           {/* Left Column: Image Gallery */}
           <div className="md:col-span-5 flex flex-col gap-4">
             {/* Primary Large Image Preview */}
-            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-stone-100 border border-stone-200 shadow-md">
+            <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-stone-100 border border-stone-200 shadow-md group">
               <Image
-                src={selectedImage || "/favicon.png"}
+                src={currentImage}
                 alt={product.name}
                 fill
-                unoptimized={Boolean(selectedImage?.startsWith("data:") || selectedImage?.startsWith("/uploads") || selectedImage?.startsWith("/"))}
-                className="object-cover"
+                unoptimized={Boolean(currentImage.startsWith("data:") || currentImage.startsWith("/uploads") || currentImage.startsWith("/"))}
+                className="object-cover transition-transform duration-300 group-hover:scale-102"
                 priority
               />
+
+              {/* Navigation Arrows for Multiple Images */}
+              {productImages.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePrevImage}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-stone-700 hover:text-stone-900 flex items-center justify-center shadow-md transition-all backdrop-blur-sm"
+                    aria-label="Foto Sebelumnya"
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <button
+                    onClick={handleNextImage}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 hover:bg-white text-stone-700 hover:text-stone-900 flex items-center justify-center shadow-md transition-all backdrop-blur-sm"
+                    aria-label="Foto Berikutnya"
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+
+                  {/* Image Counter indicator */}
+                  <div className="absolute bottom-3 right-3 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-black/60 text-white backdrop-blur-sm">
+                    {selectedImageIndex + 1} / {productImages.length}
+                  </div>
+                </>
+              )}
+
               {/* Category Pill */}
               <div className="absolute top-3 left-3">
                 <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/95 backdrop-blur-md text-forest-dark border border-gold/40 shadow-sm">
@@ -91,19 +146,19 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             </div>
 
             {/* Thumbnail selector if multiple images */}
-            {product.images.length > 1 && (
+            {productImages.length > 1 && (
               <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                {product.images.map((img, idx) => (
+                {productImages.map((img, idx) => (
                   <button
-                    key={idx}
-                    onClick={() => setSelectedImage(img)}
+                    key={`thumb-${idx}`}
+                    onClick={() => setSelectedImageIndex(idx)}
                     className={`relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all ${
-                      selectedImage === img ? "border-gold ring-2 ring-gold/40 scale-95" : "border-stone-200 opacity-70 hover:opacity-100"
+                      selectedImageIndex === idx ? "border-gold ring-2 ring-gold/40 scale-95 shadow-sm" : "border-stone-200 opacity-70 hover:opacity-100"
                     }`}
                   >
                     <Image
                       src={img || "/favicon.png"}
-                      alt={`Thumbnail ${idx}`}
+                      alt={`Thumbnail ${idx + 1}`}
                       fill
                       unoptimized={Boolean(img?.startsWith("data:") || img?.startsWith("/uploads") || img?.startsWith("/"))}
                       className="object-cover"

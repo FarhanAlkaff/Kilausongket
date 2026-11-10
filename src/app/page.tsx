@@ -18,7 +18,7 @@ import { Product, PRODUCTS, CATEGORIES, TESTIMONIALS, FAQS, STORE_INFO } from "@
 
 export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState<boolean>(false);
 
   // Dynamic state loaded from SQLite Admin Database with local cache fallback
@@ -28,6 +28,12 @@ export default function Home() {
   const [faqs, setFaqs] = useState<any[]>(FAQS);
   const [storeSettings, setStoreSettings] = useState<any>(STORE_INFO);
 
+  // Dynamically resolve active selected product from products list so all modal images and details stay 100% in sync
+  const selectedProduct = React.useMemo(() => {
+    if (!selectedProductId) return null;
+    return products.find((p) => p.id === selectedProductId || (p as any).slug === selectedProductId) || null;
+  }, [products, selectedProductId]);
+
   useEffect(() => {
     // Helper to merge overrides
     const applyOverrides = (list: any[]) => {
@@ -36,7 +42,15 @@ export default function Home() {
         if (Object.keys(overrides).length > 0) {
           return list.map((p) => {
             const override = overrides[p.id] || overrides[p.slug];
-            return override ? { ...p, ...override } : p;
+            if (override) {
+              if (override.updatedAt && p.updatedAt) {
+                const overrideTime = new Date(override.updatedAt).getTime();
+                const serverTime = new Date(p.updatedAt).getTime();
+                if (serverTime >= overrideTime) return p;
+              }
+              return { ...p, ...override };
+            }
+            return p;
           });
         }
       } catch {}
@@ -120,7 +134,10 @@ export default function Home() {
       bc = new BroadcastChannel("ks_sync");
       bc.onmessage = (event) => {
         if (event.data?.type === "PRODUCTS_UPDATED" && Array.isArray(event.data.products)) {
-          setProducts(applyOverrides(event.data.products));
+          setProducts(event.data.products);
+          try {
+            localStorage.setItem("ks_live_products", JSON.stringify(event.data.products));
+          } catch {}
         }
         if (event.data?.type === "TESTIMONIALS_UPDATED" && Array.isArray(event.data.testimonials)) {
           setTestimonials(event.data.testimonials);
@@ -196,7 +213,7 @@ export default function Home() {
       <ProductCatalog
         selectedCategory={selectedCategory}
         onSelectCategory={setSelectedCategory}
-        onViewProduct={(product) => setSelectedProduct(product)}
+        onViewProduct={(product) => setSelectedProductId(product.id || (product as any).slug)}
         products={products}
         categories={categories}
       />
@@ -231,7 +248,7 @@ export default function Home() {
       {/* Modals */}
       <ProductDetailModal
         product={selectedProduct}
-        onClose={() => setSelectedProduct(null)}
+        onClose={() => setSelectedProductId(null)}
         onOpenSizeGuide={() => setIsSizeGuideOpen(true)}
       />
 

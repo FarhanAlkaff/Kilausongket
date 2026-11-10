@@ -225,6 +225,8 @@ export default function AdminProductPage() {
       .map((c) => c.trim())
       .filter(Boolean);
 
+    const finalImages = formImages.length > 0 ? formImages : ["/images/logo.jpg"];
+
     const payload = {
       name: formName,
       category: formCategory,
@@ -232,7 +234,7 @@ export default function AdminProductPage() {
       categoryLabel: formCategoryLabel || formCategory,
       price: Number(formPrice),
       originalPrice: formOriginalPrice ? Number(formOriginalPrice) : undefined,
-      images: formImages.length > 0 ? formImages : ["/images/logo.jpg"],
+      images: finalImages,
       motif: formMotif,
       material: formMaterial,
       furing: formFuring,
@@ -244,6 +246,7 @@ export default function AdminProductPage() {
       isBestSeller: formIsBestSeller,
       isNew: formIsNew,
       isActive: formIsActive,
+      updatedAt: new Date().toISOString(),
     };
 
     try {
@@ -264,7 +267,7 @@ export default function AdminProductPage() {
 
         // Immediately update in-memory state
         const updatedList: Product[] = products.map((item) =>
-          item.id === currentId || (item.slug && item.slug === currentId)
+          item.id === currentId || ((item as any).slug && (item as any).slug === currentId)
             ? ({ ...item, ...payload } as Product)
             : item
         );
@@ -275,8 +278,9 @@ export default function AdminProductPage() {
           localStorage.setItem("ks_live_products", JSON.stringify(updatedList));
           const overrides = JSON.parse(localStorage.getItem("ks_product_overrides") || "{}");
           if (currentId) overrides[currentId] = payload;
-          const matched = products.find((p) => p.id === currentId);
-          if (matched?.slug) overrides[matched.slug] = payload;
+          const matched = products.find((p) => p.id === currentId || ((p as any).slug && (p as any).slug === currentId));
+          if (matched?.id) overrides[matched.id] = payload;
+          if ((matched as any)?.slug) overrides[(matched as any).slug] = payload;
           localStorage.setItem("ks_product_overrides", JSON.stringify(overrides));
 
           if (typeof window !== "undefined" && "BroadcastChannel" in window) {
