@@ -29,14 +29,30 @@ export default function Home() {
   const [storeSettings, setStoreSettings] = useState<any>(STORE_INFO);
 
   useEffect(() => {
+    // Helper to merge overrides
+    const applyOverrides = (list: any[]) => {
+      try {
+        const overrides = JSON.parse(localStorage.getItem("ks_product_overrides") || "{}");
+        if (Object.keys(overrides).length > 0) {
+          return list.map((p) => {
+            const override = overrides[p.id] || overrides[p.slug];
+            return override ? { ...p, ...override } : p;
+          });
+        }
+      } catch {}
+      return list;
+    };
+
     // 1. Instant hydration from client cache if available
     try {
       const cachedProducts = localStorage.getItem("ks_live_products");
       if (cachedProducts) {
         const parsed = JSON.parse(cachedProducts);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          setProducts(parsed);
+          setProducts(applyOverrides(parsed));
         }
+      } else {
+        setProducts(applyOverrides(PRODUCTS));
       }
       const cachedTestimonials = localStorage.getItem("ks_live_testimonials");
       if (cachedTestimonials) {
@@ -67,9 +83,10 @@ export default function Home() {
         const json = await res.json();
         if (json.success && json.data) {
           if (json.data.products?.length > 0) {
-            setProducts(json.data.products);
+            const finalProducts = applyOverrides(json.data.products);
+            setProducts(finalProducts);
             try {
-              localStorage.setItem("ks_live_products", JSON.stringify(json.data.products));
+              localStorage.setItem("ks_live_products", JSON.stringify(finalProducts));
             } catch {}
           }
           if (json.data.categories?.length > 0) {
@@ -103,7 +120,7 @@ export default function Home() {
       bc = new BroadcastChannel("ks_sync");
       bc.onmessage = (event) => {
         if (event.data?.type === "PRODUCTS_UPDATED" && Array.isArray(event.data.products)) {
-          setProducts(event.data.products);
+          setProducts(applyOverrides(event.data.products));
         }
         if (event.data?.type === "TESTIMONIALS_UPDATED" && Array.isArray(event.data.testimonials)) {
           setTestimonials(event.data.testimonials);

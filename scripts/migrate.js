@@ -317,3 +317,4 @@ runMigration().catch((err) => {
   console.error("\n❌ Gagal migrasi:", err);
   process.exit(1);
 });
+

@@ -101,7 +101,7 @@ export async function PUT(
       await initPostgres();
       const sql = getPostgresClient();
 
-      const existing = (await sql.query("SELECT id FROM products WHERE id = $1", [id])) as any[];
+      const existing = (await sql.query("SELECT id FROM products WHERE id = $1 OR slug = $1", [id])) as any[];
       if (existing.length === 0) {
         return NextResponse.json({ success: false, error: "Produk tidak ditemukan" }, { status: 404 });
       }
@@ -129,7 +129,7 @@ export async function PUT(
           shopee_url = COALESCE($19, shopee_url),
           sort_order = COALESCE($20, sort_order),
           updated_at = CURRENT_TIMESTAMP
-        WHERE id = $21`,
+        WHERE id = $21 OR slug = $21`,
         [
           name,
           category,
@@ -156,7 +156,7 @@ export async function PUT(
       );
     } else {
       const db = getDb();
-      const existing = db.prepare("SELECT id FROM products WHERE id = ?").get(id);
+      const existing = db.prepare("SELECT id FROM products WHERE id = ? OR slug = ?").get(id, id);
       if (!existing) {
         return NextResponse.json({ success: false, error: "Produk tidak ditemukan" }, { status: 404 });
       }
@@ -184,7 +184,7 @@ export async function PUT(
           shopee_url = COALESCE(?, shopee_url),
           sort_order = COALESCE(?, sort_order),
           updated_at = datetime('now')
-        WHERE id = ?
+        WHERE id = ? OR slug = ?
       `).run(
         name,
         category,
@@ -206,6 +206,7 @@ export async function PUT(
         specs ? JSON.stringify(specs) : null,
         shopeeUrl,
         sortOrder !== undefined ? Number(sortOrder) : null,
+        id,
         id
       );
     }
@@ -232,10 +233,10 @@ export async function DELETE(
     if (isPostgresAvailable()) {
       await initPostgres();
       const sql = getPostgresClient();
-      await sql.query("DELETE FROM products WHERE id = $1", [id]);
+      await sql.query("DELETE FROM products WHERE id = $1 OR slug = $1", [id]);
     } else {
       const db = getDb();
-      const result = db.prepare("DELETE FROM products WHERE id = ?").run(id);
+      const result = db.prepare("DELETE FROM products WHERE id = ? OR slug = ?").run(id, id);
       if (result.changes === 0) {
         return NextResponse.json({ success: false, error: "Produk tidak ditemukan" }, { status: 404 });
       }

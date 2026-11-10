@@ -87,12 +87,22 @@ export default function AdminProductPage() {
       });
       const data = await res.json();
       if (data.success && Array.isArray(data.data)) {
-        setProducts(data.data);
+        // Merge with local overrides so admin edits are never lost
+        let merged = data.data;
         try {
-          localStorage.setItem("ks_live_products", JSON.stringify(data.data));
+          const overrides = JSON.parse(localStorage.getItem("ks_product_overrides") || "{}");
+          merged = merged.map((p: Product) => {
+            const override = overrides[p.id] || overrides[p.slug];
+            return override ? { ...p, ...override } : p;
+          });
+        } catch {}
+
+        setProducts(merged);
+        try {
+          localStorage.setItem("ks_live_products", JSON.stringify(merged));
           if (typeof window !== "undefined" && "BroadcastChannel" in window) {
             const bc = new BroadcastChannel("ks_sync");
-            bc.postMessage({ type: "PRODUCTS_UPDATED", products: data.data });
+            bc.postMessage({ type: "PRODUCTS_UPDATED", products: merged });
             bc.close();
           }
         } catch {}
@@ -221,8 +231,8 @@ export default function AdminProductPage() {
       subCategory: formSubCategory,
       categoryLabel: formCategoryLabel || formCategory,
       price: Number(formPrice),
-      originalPrice: formOriginalPrice ? Number(formOriginalPrice) : null,
-      images: formImages.length > 0 ? formImages : ["https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&w=800&q=80"],
+      originalPrice: formOriginalPrice ? Number(formOriginalPrice) : undefined,
+      images: formImages.length > 0 ? formImages : ["/images/logo.jpg"],
       motif: formMotif,
       material: formMaterial,
       furing: formFuring,
@@ -251,6 +261,31 @@ export default function AdminProductPage() {
       const data = await res.json();
       if (data.success) {
         setIsModalOpen(false);
+
+        // Immediately update in-memory state
+        const updatedList: Product[] = products.map((item) =>
+          item.id === currentId || (item.slug && item.slug === currentId)
+            ? ({ ...item, ...payload } as Product)
+            : item
+        );
+        setProducts(updatedList);
+
+        // Save persistent override so it syncs across tabs instantly
+        try {
+          localStorage.setItem("ks_live_products", JSON.stringify(updatedList));
+          const overrides = JSON.parse(localStorage.getItem("ks_product_overrides") || "{}");
+          if (currentId) overrides[currentId] = payload;
+          const matched = products.find((p) => p.id === currentId);
+          if (matched?.slug) overrides[matched.slug] = payload;
+          localStorage.setItem("ks_product_overrides", JSON.stringify(overrides));
+
+          if (typeof window !== "undefined" && "BroadcastChannel" in window) {
+            const bc = new BroadcastChannel("ks_sync");
+            bc.postMessage({ type: "PRODUCTS_UPDATED", products: updatedList });
+            bc.close();
+          }
+        } catch {}
+
         loadProducts();
       } else {
         setErrorMessage(data.error || "Gagal menyimpan produk.");

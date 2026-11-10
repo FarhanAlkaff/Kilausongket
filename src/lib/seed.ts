@@ -69,7 +69,7 @@ export function seedDatabase() {
         price: 385000,
         original_price: 450000,
         images: JSON.stringify([
-          "https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&w=800&q=80",
+          "/images/logo.jpg",
           "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=800&q=80",
         ]),
         motif: "Lepus Bintang Berlian Klasik",
