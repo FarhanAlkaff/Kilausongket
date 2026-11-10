@@ -15,7 +15,9 @@ import {
   Star,
   ShoppingBag,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight
 } from "lucide-react";
 import ShopeeIcon from "@/components/ShopeeIcon";
 
@@ -75,6 +77,7 @@ export default function AdminProductPage() {
   const [formIsNew, setFormIsNew] = useState(false);
   const [formIsActive, setFormIsActive] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [draggedImageIndex, setDraggedImageIndex] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -203,6 +206,21 @@ export default function AdminProductPage() {
 
   const removeImage = (index: number) => {
     setFormImages((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const moveImage = (fromIndex: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex >= formImages.length) return;
+    setFormImages((prev) => {
+      const copy = [...prev];
+      const [moved] = copy.splice(fromIndex, 1);
+      copy.splice(toIndex, 0, moved);
+      return copy;
+    });
+  };
+
+  const setPrimaryImage = (index: number) => {
+    if (index === 0) return;
+    moveImage(index, 0);
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -731,34 +749,121 @@ export default function AdminProductPage() {
                 />
               </div>
 
-              {/* Images */}
-              <div>
-                <label className="block font-semibold text-stone-700 mb-1">
-                  Foto Produk
-                </label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {formImages.map((img, idx) => (
-                    <div
-                      key={idx}
-                      className="w-16 h-16 rounded-lg border border-stone-200 overflow-hidden relative group"
-                    >
-                      <img src={img} alt="Thumb" className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => removeImage(idx)}
-                        className="absolute inset-0 bg-red-600/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
+              {/* Images with Reorder & Primary Selector */}
+              <div className="bg-stone-50/80 p-4 rounded-2xl border border-stone-200">
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <label className="block font-semibold text-stone-800 text-xs">
+                      Foto Produk ({formImages.length} Foto)
+                    </label>
+                    <p className="text-[11px] text-stone-500">
+                      Foto <strong>#1 (Cover Depan)</strong> adalah foto yang otomatis tampil di etalase depan katalog website. Klik tombol <strong>← / →</strong> atau klik <strong>Utama</strong> untuk mengatur urutan sebelum disimpan.
+                    </p>
+                  </div>
                 </div>
+
+                {formImages.length > 0 ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+                    {formImages.map((img, idx) => (
+                      <div
+                        key={idx}
+                        draggable
+                        onDragStart={() => setDraggedImageIndex(idx)}
+                        onDragOver={(e) => e.preventDefault()}
+                        onDrop={() => {
+                          if (draggedImageIndex !== null && draggedImageIndex !== idx) {
+                            moveImage(draggedImageIndex, idx);
+                            setDraggedImageIndex(null);
+                          }
+                        }}
+                        className={`relative rounded-xl border-2 transition-all p-1.5 flex flex-col justify-between bg-white shadow-sm ${
+                          idx === 0
+                            ? "border-amber-500 ring-2 ring-amber-400/40 shadow-md"
+                            : "border-stone-200 hover:border-stone-400"
+                        }`}
+                      >
+                        {/* Image Preview */}
+                        <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-stone-100 mb-1.5">
+                          <img src={img} alt={`Foto ${idx + 1}`} className="w-full h-full object-cover" />
+                          
+                          {/* Primary Badge or Sequence */}
+                          <div className="absolute top-1 left-1">
+                            {idx === 0 ? (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-500 text-white shadow flex items-center gap-0.5">
+                                <Star className="w-3 h-3 fill-current" /> Cover Depan
+                              </span>
+                            ) : (
+                              <span className="px-1.5 py-0.5 rounded text-[10px] font-bold bg-black/60 text-white backdrop-blur-sm shadow">
+                                #{idx + 1}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Control Buttons */}
+                        <div className="flex items-center justify-between gap-1 pt-1 border-t border-stone-100">
+                          {/* Move Left */}
+                          <button
+                            type="button"
+                            disabled={idx === 0}
+                            onClick={() => moveImage(idx, idx - 1)}
+                            className="p-1 rounded text-stone-500 hover:text-stone-800 hover:bg-stone-100 disabled:opacity-25 disabled:pointer-events-none transition"
+                            title="Geser ke Kiri (Tampilkan Lebih Depan)"
+                          >
+                            <ArrowLeft className="w-3.5 h-3.5" />
+                          </button>
+
+                          {/* Make Primary Button (if not already #0) */}
+                          {idx !== 0 ? (
+                            <button
+                              type="button"
+                              onClick={() => setPrimaryImage(idx)}
+                              className="px-1.5 py-0.5 rounded text-[10px] font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200 transition"
+                              title="Jadikan Foto Cover Utama di Etalase Depan"
+                            >
+                              ★ Cover
+                            </button>
+                          ) : (
+                            <span className="text-[10px] text-amber-600 font-bold px-1">
+                              Tampilan Depan
+                            </span>
+                          )}
+
+                          {/* Move Right */}
+                          <button
+                            type="button"
+                            disabled={idx === formImages.length - 1}
+                            onClick={() => moveImage(idx, idx + 1)}
+                            className="p-1 rounded text-stone-500 hover:text-stone-800 hover:bg-stone-100 disabled:opacity-25 disabled:pointer-events-none transition"
+                            title="Geser ke Kanan"
+                          >
+                            <ArrowRight className="w-3.5 h-3.5" />
+                          </button>
+
+                          {/* Delete Button */}
+                          <button
+                            type="button"
+                            onClick={() => removeImage(idx)}
+                            className="p-1 rounded text-red-500 hover:text-red-700 hover:bg-red-50 transition"
+                            title="Hapus Foto"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4 text-xs text-stone-400 border border-dashed border-stone-300 rounded-xl mb-3">
+                    Belum ada foto. Upload foto atau masukkan link gambar di bawah ini.
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {/* File Upload */}
-                  <label className="flex items-center justify-center gap-2 px-3 py-2 border border-dashed border-stone-300 rounded-xl hover:bg-stone-50 cursor-pointer text-stone-600">
+                  <label className="flex items-center justify-center gap-2 px-3 py-2.5 border-2 border-dashed border-stone-300 rounded-xl hover:bg-white hover:border-forest/60 cursor-pointer text-stone-700 font-medium transition bg-stone-50 shadow-sm">
                     <Upload className="w-4 h-4 text-forest" />
-                    <span>{uploading ? "Mengupload..." : "Upload dari Komputer"}</span>
+                    <span>{uploading ? "Mengupload..." : "Upload Foto dari Komputer / HP"}</span>
                     <input
                       type="file"
                       accept="image/*"
@@ -774,13 +879,13 @@ export default function AdminProductPage() {
                       type="text"
                       value={newImageUrl}
                       onChange={(e) => setNewImageUrl(e.target.value)}
-                      placeholder="Atau tempel URL gambar..."
-                      className="flex-1 px-3 py-1.5 border border-stone-300 rounded-xl focus:outline-none focus:border-forest text-[11px]"
+                      placeholder="Atau tempel link URL foto..."
+                      className="flex-1 px-3 py-1.5 border border-stone-300 rounded-xl focus:outline-none focus:border-forest text-[11px] bg-white"
                     />
                     <button
                       type="button"
                       onClick={addImageUrl}
-                      className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 rounded-xl font-semibold"
+                      className="px-3.5 py-1.5 bg-stone-200 hover:bg-stone-300 text-stone-800 rounded-xl font-semibold transition"
                     >
                       Tambah
                     </button>

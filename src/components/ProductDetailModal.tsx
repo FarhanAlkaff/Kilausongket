@@ -70,12 +70,58 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
   const currentImage = productImages[selectedImageIndex] || productImages[0] || "/favicon.png";
 
+  // Find matching image index for a selected color
+  const getImageIndexForColor = (colorName: string, colorIdx: number): number => {
+    if (productImages.length <= 1) return 0;
+    const cleanColor = colorName.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+    // 1. Try finding an image whose URL or filename contains color name
+    const match = productImages.findIndex((img) => {
+      const lower = img.toLowerCase();
+      return (
+        lower.includes(cleanColor) ||
+        colorName
+          .toLowerCase()
+          .split(/\s+/)
+          .some((part) => part.length >= 3 && lower.includes(part))
+      );
+    });
+    if (match !== -1) return match;
+
+    // 2. Direct 1-to-1 index matching if within bounds
+    if (colorIdx < productImages.length) {
+      return colorIdx;
+    }
+
+    return colorIdx % productImages.length;
+  };
+
+  const handleSelectColor = (color: string, colorIdx: number) => {
+    setSelectedColor(color);
+    if (productImages.length > 1) {
+      const targetImgIdx = getImageIndexForColor(color, colorIdx);
+      setSelectedImageIndex(targetImgIdx);
+    }
+  };
+
+  const handleSelectImageIndex = (idx: number) => {
+    setSelectedImageIndex(idx);
+    if (product.colors && product.colors.length > 0) {
+      const targetColor = product.colors[idx % product.colors.length];
+      if (targetColor) {
+        setSelectedColor(targetColor);
+      }
+    }
+  };
+
   const handlePrevImage = () => {
-    setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : productImages.length - 1));
+    const nextIdx = selectedImageIndex > 0 ? selectedImageIndex - 1 : productImages.length - 1;
+    handleSelectImageIndex(nextIdx);
   };
 
   const handleNextImage = () => {
-    setSelectedImageIndex((prev) => (prev < productImages.length - 1 ? prev + 1 : 0));
+    const nextIdx = selectedImageIndex < productImages.length - 1 ? selectedImageIndex + 1 : 0;
+    handleSelectImageIndex(nextIdx);
   };
 
   const dynamicWaUrl = getWhatsAppProductUrl(product.name, `${selectedSize} - Warna: ${selectedColor}`);
@@ -151,7 +197,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 {productImages.map((img, idx) => (
                   <button
                     key={`thumb-${idx}`}
-                    onClick={() => setSelectedImageIndex(idx)}
+                    onClick={() => handleSelectImageIndex(idx)}
                     className={`relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all ${
                       selectedImageIndex === idx ? "border-gold ring-2 ring-gold/40 scale-95 shadow-sm" : "border-stone-200 opacity-70 hover:opacity-100"
                     }`}
@@ -274,15 +320,15 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                     Pilihan Warna: <span className="text-gold-dark font-semibold">{selectedColor}</span>
                   </span>
                   <div className="flex flex-wrap gap-2">
-                    {product.colors.map((color) => {
+                    {product.colors.map((color, colorIdx) => {
                       const isColorSelected = selectedColor === color;
                       return (
                         <button
                           key={color}
-                          onClick={() => setSelectedColor(color)}
+                          onClick={() => handleSelectColor(color, colorIdx)}
                           className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
                             isColorSelected
-                              ? "bg-gold text-forest-dark font-bold border-gold shadow-sm"
+                              ? "bg-gold text-forest-dark font-bold border-gold shadow-sm scale-102"
                               : "bg-white text-stone-600 border-stone-200 hover:bg-stone-50"
                           }`}
                         >
