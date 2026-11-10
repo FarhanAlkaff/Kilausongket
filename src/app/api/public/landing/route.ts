@@ -69,7 +69,7 @@ export async function GET() {
       if (cat.slug === "all") {
         count = products.length;
       } else {
-        count = products.filter((p) => p.category === cat.slug).length;
+        count = products.filter((p) => p.category === cat.slug || p.subCategory === cat.slug).length;
       }
       return {
         id: cat.slug,

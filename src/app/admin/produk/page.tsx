@@ -17,7 +17,8 @@ import {
   Sparkles,
   AlertCircle,
   ArrowLeft,
-  ArrowRight
+  ArrowRight,
+  Tags
 } from "lucide-react";
 import ShopeeIcon from "@/components/ShopeeIcon";
 
@@ -46,8 +47,31 @@ interface Product {
   shopeeUrl: string;
 }
 
+interface AdminCategory {
+  id: string;
+  slug: string;
+  label: string;
+  badge?: string;
+  count?: number;
+}
+
+const DEFAULT_SUB_CATEGORIES: Record<string, { value: string; label: string; defaultCategoryLabel: string }[]> = {
+  anak: [
+    { value: "anak-laki", label: "Anak Laki-laki", defaultCategoryLabel: "Songket Anak Laki-laki" },
+    { value: "anak-perempuan", label: "Anak Perempuan", defaultCategoryLabel: "Songket Anak Perempuan" },
+  ],
+  dewasa: [
+    { value: "dewasa-wanita", label: "Dewasa Wanita (Kebaya / Kurung)", defaultCategoryLabel: "Songket Wanita Dewasa" },
+    { value: "dewasa-pria", label: "Dewasa Pria (Teluk Belanga / Cekak Musang)", defaultCategoryLabel: "Songket Pria Dewasa" },
+  ],
+  sarimbit: [
+    { value: "sarimbit", label: "Sarimbit Keluarga", defaultCategoryLabel: "Sarimbit Keluarga" },
+  ],
+};
+
 export default function AdminProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<AdminCategory[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -61,6 +85,7 @@ export default function AdminProductPage() {
   const [formName, setFormName] = useState("");
   const [formCategory, setFormCategory] = useState("anak");
   const [formSubCategory, setFormSubCategory] = useState("anak-laki");
+  const [isCustomSubCategory, setIsCustomSubCategory] = useState(false);
   const [formCategoryLabel, setFormCategoryLabel] = useState("");
   const [formPrice, setFormPrice] = useState("");
   const [formOriginalPrice, setFormOriginalPrice] = useState("");
@@ -115,17 +140,76 @@ export default function AdminProductPage() {
     }
   };
 
+  const loadCategories = async () => {
+    try {
+      const res = await fetch(`/api/admin/categories?t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
+      const data = await res.json();
+      if (data.success && Array.isArray(data.data)) {
+        setCategories(data.data);
+      }
+    } catch (err) {
+      console.error("Gagal load categories:", err);
+    }
+  };
+
   useEffect(() => {
     loadProducts();
+    loadCategories();
   }, []);
+
+  const handleCategoryChange = (newCat: string) => {
+    setFormCategory(newCat);
+    const subOpts = DEFAULT_SUB_CATEGORIES[newCat];
+    if (subOpts && subOpts.length > 0) {
+      setIsCustomSubCategory(false);
+      setFormSubCategory(subOpts[0].value);
+      setFormCategoryLabel(subOpts[0].defaultCategoryLabel);
+    } else {
+      const matching = categories.find((c) => c.slug === newCat);
+      setIsCustomSubCategory(false);
+      setFormSubCategory(newCat);
+      setFormCategoryLabel(matching ? matching.label : newCat);
+    }
+  };
+
+  const handleSubCategorySelect = (selectedVal: string) => {
+    if (selectedVal === "__custom__") {
+      setIsCustomSubCategory(true);
+      setFormSubCategory("");
+      return;
+    }
+    setIsCustomSubCategory(false);
+    setFormSubCategory(selectedVal);
+    const subOpts = DEFAULT_SUB_CATEGORIES[formCategory];
+    const found = subOpts?.find((o) => o.value === selectedVal);
+    if (found) {
+      setFormCategoryLabel(found.defaultCategoryLabel);
+    } else {
+      const matching = categories.find((c) => c.slug === selectedVal);
+      if (matching) {
+        setFormCategoryLabel(matching.label);
+      }
+    }
+  };
 
   const openAddModal = () => {
     setIsEditing(false);
     setCurrentId(null);
     setFormName("");
-    setFormCategory("anak");
-    setFormSubCategory("anak-laki");
-    setFormCategoryLabel("Songket Anak Laki-laki");
+    const initialCategory = categories.find((c) => c.slug !== "all")?.slug || "anak";
+    setFormCategory(initialCategory);
+    const subOpts = DEFAULT_SUB_CATEGORIES[initialCategory];
+    if (subOpts && subOpts.length > 0) {
+      setFormSubCategory(subOpts[0].value);
+      setFormCategoryLabel(subOpts[0].defaultCategoryLabel);
+    } else {
+      setFormSubCategory(initialCategory);
+      setFormCategoryLabel("Songket Anak Laki-laki");
+    }
+    setIsCustomSubCategory(false);
     setFormPrice("");
     setFormOriginalPrice("");
     setFormImages([]);
@@ -159,6 +243,9 @@ export default function AdminProductPage() {
     setFormName(p.name);
     setFormCategory(p.category);
     setFormSubCategory(p.subCategory || p.category);
+    const subOpts = DEFAULT_SUB_CATEGORIES[p.category] || [];
+    const isPreset = subOpts.some((s) => s.value === p.subCategory);
+    setIsCustomSubCategory(!isPreset && Boolean(p.subCategory) && p.subCategory !== p.category);
     setFormCategoryLabel(p.categoryLabel || "");
     setFormPrice(p.price.toString());
     setFormOriginalPrice(p.originalPrice ? p.originalPrice.toString() : "");
@@ -412,11 +499,14 @@ export default function AdminProductPage() {
 
   const filteredProducts = products.filter((p) => {
     const matchCategory =
-      selectedCategory === "all" || p.category === selectedCategory;
+      selectedCategory === "all" ||
+      p.category === selectedCategory ||
+      p.subCategory === selectedCategory;
     const matchSearch =
       p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.motif?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      p.material?.toLowerCase().includes(searchTerm.toLowerCase());
+      p.material?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.categoryLabel?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchCategory && matchSearch;
   });
 
@@ -454,19 +544,54 @@ export default function AdminProductPage() {
         </div>
 
         <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
-          {["all", "anak", "dewasa", "sarimbit"].map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold capitalize whitespace-nowrap transition ${
-                selectedCategory === cat
-                  ? "bg-forest text-white shadow-sm"
-                  : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+          <button
+            onClick={() => setSelectedCategory("all")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 ${
+              selectedCategory === "all"
+                ? "bg-forest text-white shadow-sm"
+                : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+            }`}
+          >
+            <span>Semua Kategori</span>
+            <span
+              className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                selectedCategory === "all"
+                  ? "bg-white/20 text-white"
+                  : "bg-stone-200 text-stone-600"
               }`}
             >
-              {cat === "all" ? "Semua Kategori" : cat}
-            </button>
-          ))}
+              {products.length}
+            </span>
+          </button>
+          {categories
+            .filter((c) => c.slug !== "all")
+            .map((cat) => {
+              const count = products.filter(
+                (p) => p.category === cat.slug || p.subCategory === cat.slug
+              ).length;
+              return (
+                <button
+                  key={cat.id || cat.slug}
+                  onClick={() => setSelectedCategory(cat.slug)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition flex items-center gap-1.5 ${
+                    selectedCategory === cat.slug
+                      ? "bg-forest text-white shadow-sm"
+                      : "bg-stone-100 text-stone-600 hover:bg-stone-200"
+                  }`}
+                >
+                  <span>{cat.label}</span>
+                  <span
+                    className={`text-[10px] px-1.5 py-0.2 rounded-full font-bold ${
+                      selectedCategory === cat.slug
+                        ? "bg-white/20 text-white"
+                        : "bg-stone-200 text-stone-600"
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
         </div>
       </div>
 
@@ -658,52 +783,131 @@ export default function AdminProductPage() {
                 />
               </div>
 
-              {/* Category & Subcategory */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">
-                    Kategori Utama *
-                  </label>
-                  <select
-                    value={formCategory}
-                    onChange={(e) => setFormCategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest bg-white"
+              {/* Category & Subcategory Box */}
+              <div className="bg-stone-50/80 p-3.5 rounded-2xl border border-stone-200/80 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-stone-800 text-xs flex items-center gap-1.5">
+                    <Tags className="w-3.5 h-3.5 text-forest" />
+                    Pengkategorian Produk
+                  </span>
+                  <a
+                    href="/admin/kategori"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-[11px] font-bold text-forest hover:text-forest-light inline-flex items-center gap-1 hover:underline"
+                    title="Buka Halaman Master Kategori"
                   >
-                    <option value="anak">Anak (1-12 Th)</option>
-                    <option value="dewasa">Dewasa</option>
-                    <option value="sarimbit">Sarimbit Keluarga</option>
-                  </select>
+                    <span>Kelola Master Kategori</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
                 </div>
 
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">
-                    Sub Kategori
-                  </label>
-                  <select
-                    value={formSubCategory}
-                    onChange={(e) => setFormSubCategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest bg-white"
-                  >
-                    <option value="anak-laki">Anak Laki-laki</option>
-                    <option value="anak-perempuan">Anak Perempuan</option>
-                    <option value="dewasa-wanita">Dewasa Wanita</option>
-                    <option value="dewasa-pria">Dewasa Pria</option>
-                    <option value="sarimbit">Sarimbit Keluarga</option>
-                  </select>
-                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  {/* Kategori Utama */}
+                  <div>
+                    <label className="block text-[11px] font-semibold text-stone-700 mb-1">
+                      Kategori Utama *
+                    </label>
+                    <select
+                      value={formCategory}
+                      onChange={(e) => handleCategoryChange(e.target.value)}
+                      className="w-full px-3 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest bg-white font-medium text-xs"
+                    >
+                      {categories.filter((c) => c.slug !== "all").length > 0 ? (
+                        categories
+                          .filter((c) => c.slug !== "all")
+                          .map((c) => (
+                            <option key={c.slug} value={c.slug}>
+                              {c.label}
+                            </option>
+                          ))
+                      ) : (
+                        <>
+                          <option value="anak">Songket Anak (1-12 Th)</option>
+                          <option value="dewasa">Songket Dewasa (Pria &amp; Wanita)</option>
+                          <option value="sarimbit">Sarimbit Keluarga</option>
+                        </>
+                      )}
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block font-semibold text-stone-700 mb-1">
-                    Label Kategori
-                  </label>
-                  <input
-                    type="text"
-                    value={formCategoryLabel}
-                    onChange={(e) => setFormCategoryLabel(e.target.value)}
-                    placeholder="Contoh: Songket Anak Laki-laki"
-                    className="w-full px-3 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest"
-                  />
+                  {/* Sub Kategori */}
+                  <div>
+                    <label className="block text-[11px] font-semibold text-stone-700 mb-1">
+                      Sub Kategori
+                    </label>
+                    {!isCustomSubCategory ? (
+                      <select
+                        value={formSubCategory}
+                        onChange={(e) => handleSubCategorySelect(e.target.value)}
+                        className="w-full px-3 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest bg-white font-medium text-xs"
+                      >
+                        {(DEFAULT_SUB_CATEGORIES[formCategory] || []).map((sub) => (
+                          <option key={sub.value} value={sub.value}>
+                            {sub.label}
+                          </option>
+                        ))}
+                        {formSubCategory &&
+                          !(DEFAULT_SUB_CATEGORIES[formCategory] || []).some(
+                            (s) => s.value === formSubCategory
+                          ) && (
+                            <option value={formSubCategory}>
+                              {formSubCategory}
+                            </option>
+                          )}
+                        <option value="__custom__">+ Ketik Sub Kategori Baru...</option>
+                      </select>
+                    ) : (
+                      <div className="flex gap-1">
+                        <input
+                          type="text"
+                          value={formSubCategory}
+                          onChange={(e) => {
+                            setFormSubCategory(e.target.value);
+                            if (!formCategoryLabel || formCategoryLabel === formSubCategory) {
+                              setFormCategoryLabel(e.target.value);
+                            }
+                          }}
+                          placeholder="Ketik sub kategori..."
+                          className="w-full px-3 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest bg-white text-xs"
+                          autoFocus
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsCustomSubCategory(false);
+                            const def = DEFAULT_SUB_CATEGORIES[formCategory];
+                            if (def && def.length > 0) {
+                              setFormSubCategory(def[0].value);
+                              setFormCategoryLabel(def[0].defaultCategoryLabel);
+                            }
+                          }}
+                          className="px-2 py-1 text-stone-400 hover:text-stone-700 text-xs rounded-lg"
+                          title="Batal custom"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Label Kategori */}
+                  <div>
+                    <label className="block text-[11px] font-semibold text-stone-700 mb-1">
+                      Label Kategori
+                    </label>
+                    <input
+                      type="text"
+                      value={formCategoryLabel}
+                      onChange={(e) => setFormCategoryLabel(e.target.value)}
+                      placeholder="Contoh: Songket Anak Laki-laki"
+                      className="w-full px-3 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest text-xs"
+                    />
+                  </div>
                 </div>
+                <p className="text-[10px] text-stone-400">
+                  Tip: Memilih Kategori Utama &amp; Sub Kategori akan otomatis mengisi Label Kategori. Anda juga dapat mengetik label kustom.
+                </p>
               </div>
 
               {/* Price & Original Price */}
