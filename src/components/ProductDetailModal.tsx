@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { 
   X, 
@@ -33,9 +33,21 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   const { settings, getWhatsAppProductUrl } = useStoreSettings();
   if (!product) return null;
 
-  const [selectedImage, setSelectedImage] = useState(product.images[0]);
+  const [selectedImage, setSelectedImage] = useState(product.images[0] || "/favicon.png");
   const [selectedSize, setSelectedSize] = useState(product.availableSizes[0] || "");
   const [selectedColor, setSelectedColor] = useState(product.colors[0] || "");
+
+  useEffect(() => {
+    if (product && Array.isArray(product.images) && product.images.length > 0) {
+      setSelectedImage(product.images[0]);
+    }
+    if (product && Array.isArray(product.availableSizes) && product.availableSizes.length > 0) {
+      setSelectedSize(product.availableSizes[0]);
+    }
+    if (product && Array.isArray(product.colors) && product.colors.length > 0) {
+      setSelectedColor(product.colors[0]);
+    }
+  }, [product]);
 
   const dynamicWaUrl = getWhatsAppProductUrl(product.name, `${selectedSize} - Warna: ${selectedColor}`);
   const shopeeLink = product.shopeeUrl || settings.shopeeUrl || STORE_INFO.shopeeUrl;

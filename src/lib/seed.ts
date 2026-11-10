@@ -69,8 +69,7 @@ export function seedDatabase() {
         price: 385000,
         original_price: 450000,
         images: JSON.stringify([
-          "/images/logo.jpg",
-          "https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=800&q=80",
+          "/images/logo.jpg"
         ]),
         motif: "Lepus Bintang Berlian Klasik",
         material: "Songket Tenun Halus Grade A & Benang Emas Metalik",
