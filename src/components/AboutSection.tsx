@@ -39,12 +39,12 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ aboutText, aboutVide
     <section id="tentang" className="py-16 sm:py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* Left Column: Visual Story Video with FadeInLeft */}
-          <FadeInLeft className="lg:col-span-5 relative">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-ivory aspect-[4/5] bg-stone-950 group">
-              {/* YouTube Video Player Embed */}
+          {/* Left Column: Visual Story Video with FadeInLeft (Landscape 16:9) */}
+          <FadeInLeft className="lg:col-span-6 relative">
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-ivory aspect-video bg-stone-950 group">
+              {/* YouTube Video Player Embed (Native Landscape 16:9) */}
               <iframe
                 src={videoInfo.embedUrl}
                 title="Filosofi Kilau Songket - Tenun Tradisional Palembang"
@@ -63,13 +63,13 @@ export const AboutSection: React.FC<AboutSectionProps> = ({ aboutText, aboutVide
             </div>
 
             {/* Floating Logo Badge */}
-            <div className="absolute -bottom-6 -right-4 sm:-right-6 bg-white p-4 rounded-2xl shadow-xl border border-gold/30 hidden sm:block">
+            <div className="absolute -bottom-4 -right-3 sm:-right-4 bg-white p-3 rounded-2xl shadow-xl border border-gold/30 hidden sm:block z-10">
               <BrandLogo variant="dark" size="sm" />
             </div>
           </FadeInLeft>
 
           {/* Right Column: Story & Identity with FadeInRight */}
-          <FadeInRight className="lg:col-span-7 space-y-6">
+          <FadeInRight className="lg:col-span-6 space-y-6">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-forest/5 border border-gold/40 text-forest-dark text-xs font-semibold uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5 text-gold-dark" />
               <span>Tentang Kilau Songket</span>
