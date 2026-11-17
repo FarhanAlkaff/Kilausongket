@@ -124,9 +124,14 @@ function initializeDatabase(db: Database.Database) {
       promo_subtitle TEXT DEFAULT '',
       hero_title TEXT DEFAULT '',
       hero_subtitle TEXT DEFAULT '',
+      hero_highlight_word TEXT DEFAULT 'Songket',
       about_text TEXT DEFAULT ''
     );
   `);
+
+  try {
+    db.exec("ALTER TABLE store_settings ADD COLUMN hero_highlight_word TEXT DEFAULT 'Songket'");
+  } catch {}
 
   // Safe migration for testimonials extra columns
   try {

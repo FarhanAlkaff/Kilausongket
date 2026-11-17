@@ -128,9 +128,14 @@ async function handleMigration(req: NextRequest) {
         promo_subtitle TEXT DEFAULT '',
         hero_title TEXT DEFAULT '',
         hero_subtitle TEXT DEFAULT '',
+        hero_highlight_word TEXT DEFAULT 'Songket',
         about_text TEXT DEFAULT ''
       )
     `;
+
+    try {
+      await sql`ALTER TABLE public.store_settings ADD COLUMN IF NOT EXISTS hero_highlight_word TEXT DEFAULT 'Songket'`;
+    } catch {}
 
     // 2. Insert Admin
     const defaultUser = process.env.ADMIN_USERNAME || "admin";

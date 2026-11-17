@@ -178,7 +178,12 @@ export default function Home() {
       />
 
       {/* Hero Section */}
-      <Hero onExploreClick={handleExploreClick} />
+      <Hero
+        onExploreClick={handleExploreClick}
+        heroTitle={storeSettings?.heroTitle}
+        heroSubtitle={storeSettings?.heroSubtitle}
+        heroHighlightWord={storeSettings?.heroHighlightWord}
+      />
 
       {/* Category Highlights */}
       <Categories

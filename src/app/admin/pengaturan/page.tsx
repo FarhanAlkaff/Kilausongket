@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { useStoreSettings } from "@/context/StoreSettingsContext";
 import ShopeeIcon from "@/components/ShopeeIcon";
+import { renderFormattedHeroTitle } from "@/components/Hero";
 
 export default function AdminSettingsPage() {
   const { refreshSettings } = useStoreSettings();
@@ -40,8 +41,9 @@ export default function AdminSettingsPage() {
     email: "halo@kilausongket.com",
     operationalHours: "Senin - Minggu: 08.00 - 21.00 WIB",
     address: "Sentra Tenun & Butik Kilau Songket, Jl. Kebangsaan No. 88, Indonesia",
-    heroTitle: "Busana Songket Premium untuk Si Kecil & Keluarga",
-    heroSubtitle: "Koleksi setelan songket anak & dewasa dengan furing katun anti-gatal. Tenunan benang emas presisi, desain modern elegan.",
+    heroTitle: "Hadirkan Pesona Songket di Setiap Penampilan",
+    heroSubtitle: "Temukan beragam koleksi songket dan busana pilihan untuk melengkapi setiap moment istimewa.",
+    heroHighlightWord: "Songket",
     promoTitle: "Promo Spesial Hari Kartini & Hari Raya 2026",
     promoSubtitle: "Dapatkan Gratis Tanjak Cilik / Selendang Senada untuk setiap pembelian paket Songket Anak & Sarimbit Keluarga.",
     aboutText: "",
@@ -314,18 +316,57 @@ export default function AdminSettingsPage() {
           </div>
 
           <div className="space-y-4">
-            <div>
-              <label className="block font-semibold text-stone-700 mb-1">
-                Judul Hero Section (Headline Utama)
-              </label>
-              <input
-                type="text"
-                name="heroTitle"
-                value={form.heroTitle}
-                onChange={handleChange}
-                placeholder="Busana Songket Premium untuk Si Kecil & Keluarga"
-                className="w-full px-3.5 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="sm:col-span-2">
+                <label className="block font-semibold text-stone-700 mb-1">
+                  Judul Hero Section (Headline Utama)
+                </label>
+                <input
+                  type="text"
+                  name="heroTitle"
+                  value={form.heroTitle}
+                  onChange={handleChange}
+                  placeholder="Hadirkan Pesona Songket di Setiap Penampilan"
+                  className="w-full px-3.5 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-stone-700 mb-1">
+                  Kata Berkilau (Aksen Emas)
+                </label>
+                <input
+                  type="text"
+                  name="heroHighlightWord"
+                  value={form.heroHighlightWord || ""}
+                  onChange={handleChange}
+                  placeholder="Songket"
+                  className="w-full px-3.5 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest font-semibold text-gold-dark"
+                />
+                <span className="text-[10px] text-stone-400 mt-0.5 block">
+                  Kata yang akan berkilau emas & bergaris lengkung
+                </span>
+              </div>
+            </div>
+
+            {/* Live Preview Box */}
+            <div className="p-3.5 bg-stone-50 border border-stone-200/90 rounded-xl space-y-1.5">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 text-[11px] text-stone-500 font-semibold">
+                <span>Preview Headline di Halaman Depan:</span>
+                <span className="text-[10px] text-stone-400 font-normal">
+                  Tip: Anda juga bisa menulis kurung <code className="bg-white px-1 py-0.5 rounded border border-stone-200 text-forest font-mono">[Kata]</code> di judul.
+                </span>
+              </div>
+              <div className="p-4 bg-ivory-warm rounded-lg border border-gold/25 shadow-inner">
+                <div className="font-serif text-lg sm:text-2xl font-bold text-forest-dark tracking-tight leading-snug">
+                  {renderFormattedHeroTitle(form.heroTitle, form.heroHighlightWord || "Songket")}
+                </div>
+                {form.heroSubtitle && (
+                  <p className="text-xs sm:text-sm text-charcoal-light mt-2 leading-relaxed">
+                    {form.heroSubtitle}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div>

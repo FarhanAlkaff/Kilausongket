@@ -130,9 +130,14 @@ export async function initPostgres(): Promise<void> {
         promo_subtitle TEXT DEFAULT '',
         hero_title TEXT DEFAULT '',
         hero_subtitle TEXT DEFAULT '',
+        hero_highlight_word TEXT DEFAULT 'Songket',
         about_text TEXT DEFAULT ''
       )
     `;
+
+    try {
+      await sql`ALTER TABLE store_settings ADD COLUMN IF NOT EXISTS hero_highlight_word TEXT DEFAULT 'Songket'`;
+    } catch {}
 
     // Seed Admin
     const admins = await sql`SELECT id FROM admins LIMIT 1`;

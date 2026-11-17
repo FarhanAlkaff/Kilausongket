@@ -18,12 +18,103 @@ import ShopeeIcon from "./ShopeeIcon";
 
 interface HeroProps {
   onExploreClick: () => void;
+  heroTitle?: string;
+  heroSubtitle?: string;
+  heroHighlightWord?: string;
 }
 
-export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
+export function renderFormattedHeroTitle(rawTitle?: string, highlightWord?: string) {
+  const title = (rawTitle || "").trim() || "Keanggunan Warisan Songket untuk Seluruh Generasi";
+
+  // Check 1: Bracket syntax e.g. "Hadirkan Pesona [Songket] di Setiap Penampilan"
+  const bracketRegex = /\[(.*?)\]/;
+  if (bracketRegex.test(title)) {
+    const parts = title.split(/(\[.*?\])/);
+    return (
+      <>
+        {parts.map((part, idx) => {
+          if (part.startsWith("[") && part.endsWith("]")) {
+            const inner = part.slice(1, -1);
+            return (
+              <span key={idx} className="text-gold-gradient relative inline-block">
+                {inner}
+                <svg className="absolute -bottom-1 left-0 w-full h-2 text-gold/40" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" />
+                </svg>
+              </span>
+            );
+          }
+          return <React.Fragment key={idx}>{part}</React.Fragment>;
+        })}
+      </>
+    );
+  }
+
+  // Check 2: Word highlight (default "Songket" or explicit word from admin)
+  const target = (highlightWord || "Songket").trim();
+  if (target) {
+    const escaped = target.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const regex = new RegExp(`(${escaped})`, "gi");
+    const parts = title.split(regex);
+    if (parts.length > 1) {
+      return (
+        <>
+          {parts.map((part, idx) => {
+            if (part.toLowerCase() === target.toLowerCase()) {
+              return (
+                <span key={idx} className="text-gold-gradient relative inline-block">
+                  {part}
+                  <svg className="absolute -bottom-1 left-0 w-full h-2 text-gold/40" viewBox="0 0 100 10" preserveAspectRatio="none">
+                    <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" />
+                  </svg>
+                </span>
+              );
+            }
+            return <React.Fragment key={idx}>{part}</React.Fragment>;
+          })}
+        </>
+      );
+    }
+  }
+
+  // Fallback if "Songket" exists in title
+  if (/songket/i.test(title)) {
+    const parts = title.split(/(songket)/gi);
+    return (
+      <>
+        {parts.map((part, idx) => {
+          if (part.toLowerCase() === "songket") {
+            return (
+              <span key={idx} className="text-gold-gradient relative inline-block">
+                {part}
+                <svg className="absolute -bottom-1 left-0 w-full h-2 text-gold/40" viewBox="0 0 100 10" preserveAspectRatio="none">
+                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" />
+                </svg>
+              </span>
+            );
+          }
+          return <React.Fragment key={idx}>{part}</React.Fragment>;
+        })}
+      </>
+    );
+  }
+
+  return <>{title}</>;
+}
+
+export const Hero: React.FC<HeroProps> = ({
+  onExploreClick,
+  heroTitle,
+  heroSubtitle,
+  heroHighlightWord
+}) => {
   const { settings } = useStoreSettings();
   const whatsappNum = settings.whatsappNumber || STORE_INFO.whatsappNumber;
   const shopeeLink = settings.shopeeUrl || STORE_INFO.shopeeUrl;
+
+  const activeTitle = heroTitle || settings.heroTitle || "Keanggunan Warisan Songket untuk Seluruh Generasi";
+  const activeSubtitle = heroSubtitle || settings.heroSubtitle || "Koleksi setelan songket premium untuk anak-anak dan dewasa. Dibuat dengan benang emas berkualitas tinggi dan furing katun lembut anti-gatal agar si kecil dan keluarga nyaman tampil memukau di momen istimewa.";
+  const activeHighlight = heroHighlightWord || (settings as any).heroHighlightWord || "Songket";
   return (
     <section id="beranda" className="relative overflow-hidden bg-ivory-warm pt-6 pb-16 lg:pt-12 lg:pb-24 border-b border-gold/15">
       {/* Decorative Background Elements */}
@@ -51,21 +142,14 @@ export const Hero: React.FC<HeroProps> = ({ onExploreClick }) => {
               <span>Digital Storefront & Eksklusif Songket Indonesia</span>
             </motion.div>
 
-            {/* Main Headline - Restored exactly to original Image 2 */}
+            {/* Main Headline - Dynamic with Golden Highlight */}
             <h1 className="font-serif text-3xl sm:text-5xl lg:text-6xl font-bold text-forest-dark tracking-tight leading-[1.15]">
-              Keanggunan Warisan{" "}
-              <span className="text-gold-gradient relative inline-block">
-                Songket
-                <svg className="absolute -bottom-1 left-0 w-full h-2 text-gold/40" viewBox="0 0 100 10" preserveAspectRatio="none">
-                  <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="3" fill="none" />
-                </svg>
-              </span>{" "}
-              untuk Seluruh Generasi
+              {renderFormattedHeroTitle(activeTitle, activeHighlight)}
             </h1>
 
             {/* Description */}
-            <p className="text-base sm:text-lg text-charcoal-light max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Koleksi setelan songket premium untuk <strong className="text-forest font-semibold">anak-anak</strong> dan <strong className="text-forest font-semibold">dewasa</strong>. Dibuat dengan benang emas berkualitas tinggi dan <span className="bg-gold/15 px-1.5 py-0.5 rounded text-forest-dark font-medium">furing katun lembut anti-gatal</span> agar si kecil dan keluarga nyaman tampil memukau di momen istimewa.
+            <p className="text-base sm:text-lg text-charcoal-light max-w-2xl mx-auto lg:mx-0 leading-relaxed whitespace-pre-line">
+              {activeSubtitle}
             </p>
 
             {/* Key Value Bullets */}

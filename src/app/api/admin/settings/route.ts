@@ -43,6 +43,7 @@ export async function GET() {
         promoSubtitle: settings.promo_subtitle,
         heroTitle: settings.hero_title,
         heroSubtitle: settings.hero_subtitle,
+        heroHighlightWord: settings.hero_highlight_word || "Songket",
         aboutText: settings.about_text,
       },
     });
@@ -75,6 +76,7 @@ export async function PUT(req: NextRequest) {
       promoSubtitle,
       heroTitle,
       heroSubtitle,
+      heroHighlightWord,
       aboutText,
     } = body;
 
@@ -85,9 +87,9 @@ export async function PUT(req: NextRequest) {
         `INSERT INTO store_settings (
           id, name, tagline, whatsapp_number, whatsapp_display, shopee_url,
           instagram_url, tiktok_url, email, operational_hours, address,
-          promo_title, promo_subtitle, hero_title, hero_subtitle, about_text
+          promo_title, promo_subtitle, hero_title, hero_subtitle, hero_highlight_word, about_text
         ) VALUES (
-          'main', $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15
+          'main', $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
         )
         ON CONFLICT(id) DO UPDATE SET
           name = COALESCE(EXCLUDED.name, store_settings.name),
@@ -104,6 +106,7 @@ export async function PUT(req: NextRequest) {
           promo_subtitle = COALESCE(EXCLUDED.promo_subtitle, store_settings.promo_subtitle),
           hero_title = COALESCE(EXCLUDED.hero_title, store_settings.hero_title),
           hero_subtitle = COALESCE(EXCLUDED.hero_subtitle, store_settings.hero_subtitle),
+          hero_highlight_word = COALESCE(EXCLUDED.hero_highlight_word, store_settings.hero_highlight_word),
           about_text = COALESCE(EXCLUDED.about_text, store_settings.about_text)`,
         [
           name,
@@ -120,6 +123,7 @@ export async function PUT(req: NextRequest) {
           promoSubtitle,
           heroTitle,
           heroSubtitle,
+          heroHighlightWord || "Songket",
           aboutText,
         ]
       );
@@ -130,9 +134,9 @@ export async function PUT(req: NextRequest) {
         INSERT INTO store_settings (
           id, name, tagline, whatsapp_number, whatsapp_display, shopee_url,
           instagram_url, tiktok_url, email, operational_hours, address,
-          promo_title, promo_subtitle, hero_title, hero_subtitle, about_text
+          promo_title, promo_subtitle, hero_title, hero_subtitle, hero_highlight_word, about_text
         ) VALUES (
-          'main', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+          'main', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         )
         ON CONFLICT(id) DO UPDATE SET
           name = COALESCE(excluded.name, store_settings.name),
@@ -149,6 +153,7 @@ export async function PUT(req: NextRequest) {
           promo_subtitle = COALESCE(excluded.promo_subtitle, store_settings.promo_subtitle),
           hero_title = COALESCE(excluded.hero_title, store_settings.hero_title),
           hero_subtitle = COALESCE(excluded.hero_subtitle, store_settings.hero_subtitle),
+          hero_highlight_word = COALESCE(excluded.hero_highlight_word, store_settings.hero_highlight_word),
           about_text = COALESCE(excluded.about_text, store_settings.about_text)
       `).run(
         name,
@@ -165,6 +170,7 @@ export async function PUT(req: NextRequest) {
         promoSubtitle,
         heroTitle,
         heroSubtitle,
+        heroHighlightWord || "Songket",
         aboutText
       );
     }

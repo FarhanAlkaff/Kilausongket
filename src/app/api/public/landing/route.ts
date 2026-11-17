@@ -118,6 +118,7 @@ export async function GET() {
           promoSubtitle: settings.promo_subtitle,
           heroTitle: settings.hero_title,
           heroSubtitle: settings.hero_subtitle,
+          heroHighlightWord: settings.hero_highlight_word || "Songket",
           aboutText: settings.about_text,
         }
       : null;

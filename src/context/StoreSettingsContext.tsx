@@ -18,6 +18,7 @@ export interface StoreSettings {
   promoSubtitle: string;
   heroTitle: string;
   heroSubtitle: string;
+  heroHighlightWord: string;
   aboutText: string;
 }
 
@@ -33,6 +34,7 @@ const defaultSettings: StoreSettings = {
   promoSubtitle: "",
   heroTitle: "",
   heroSubtitle: "",
+  heroHighlightWord: "Songket",
   aboutText: "",
 };
 
@@ -70,6 +72,7 @@ export const StoreSettingsProvider: React.FC<{ children: React.ReactNode }> = ({
           promoSubtitle: json.data.promoSubtitle || prev.promoSubtitle,
           heroTitle: json.data.heroTitle || prev.heroTitle,
           heroSubtitle: json.data.heroSubtitle || prev.heroSubtitle,
+          heroHighlightWord: json.data.heroHighlightWord || prev.heroHighlightWord || "Songket",
           aboutText: json.data.aboutText || prev.aboutText,
         }));
       }
