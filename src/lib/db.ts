@@ -125,12 +125,16 @@ function initializeDatabase(db: Database.Database) {
       hero_title TEXT DEFAULT '',
       hero_subtitle TEXT DEFAULT '',
       hero_highlight_word TEXT DEFAULT 'Songket',
+      about_video_url TEXT DEFAULT 'https://www.youtube.com/watch?v=3g8K1oWq0eE',
       about_text TEXT DEFAULT ''
     );
   `);
 
   try {
     db.exec("ALTER TABLE store_settings ADD COLUMN hero_highlight_word TEXT DEFAULT 'Songket'");
+  } catch {}
+  try {
+    db.exec("ALTER TABLE store_settings ADD COLUMN about_video_url TEXT DEFAULT 'https://www.youtube.com/watch?v=3g8K1oWq0eE'");
   } catch {}
 
   // Safe migration for testimonials extra columns

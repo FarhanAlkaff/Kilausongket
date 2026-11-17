@@ -19,6 +19,7 @@ export interface StoreSettings {
   heroTitle: string;
   heroSubtitle: string;
   heroHighlightWord: string;
+  aboutVideoUrl: string;
   aboutText: string;
 }
 
@@ -35,6 +36,7 @@ const defaultSettings: StoreSettings = {
   heroTitle: "",
   heroSubtitle: "",
   heroHighlightWord: "Songket",
+  aboutVideoUrl: "https://www.youtube.com/watch?v=3g8K1oWq0eE",
   aboutText: "",
 };
 
@@ -73,6 +75,7 @@ export const StoreSettingsProvider: React.FC<{ children: React.ReactNode }> = ({
           heroTitle: json.data.heroTitle || prev.heroTitle,
           heroSubtitle: json.data.heroSubtitle || prev.heroSubtitle,
           heroHighlightWord: json.data.heroHighlightWord || prev.heroHighlightWord || "Songket",
+          aboutVideoUrl: json.data.aboutVideoUrl || prev.aboutVideoUrl || "https://www.youtube.com/watch?v=3g8K1oWq0eE",
           aboutText: json.data.aboutText || prev.aboutText,
         }));
       }

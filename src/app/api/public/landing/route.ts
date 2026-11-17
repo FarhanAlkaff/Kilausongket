@@ -119,6 +119,7 @@ export async function GET() {
           heroTitle: settings.hero_title,
           heroSubtitle: settings.hero_subtitle,
           heroHighlightWord: settings.hero_highlight_word || "Songket",
+          aboutVideoUrl: settings.about_video_url || "https://www.youtube.com/watch?v=3g8K1oWq0eE",
           aboutText: settings.about_text,
         }
       : null;

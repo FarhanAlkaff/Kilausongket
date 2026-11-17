@@ -131,12 +131,16 @@ export async function initPostgres(): Promise<void> {
         hero_title TEXT DEFAULT '',
         hero_subtitle TEXT DEFAULT '',
         hero_highlight_word TEXT DEFAULT 'Songket',
+        about_video_url TEXT DEFAULT 'https://www.youtube.com/watch?v=3g8K1oWq0eE',
         about_text TEXT DEFAULT ''
       )
     `;
 
     try {
       await sql`ALTER TABLE store_settings ADD COLUMN IF NOT EXISTS hero_highlight_word TEXT DEFAULT 'Songket'`;
+    } catch {}
+    try {
+      await sql`ALTER TABLE store_settings ADD COLUMN IF NOT EXISTS about_video_url TEXT DEFAULT 'https://www.youtube.com/watch?v=3g8K1oWq0eE'`;
     } catch {}
 
     // Seed Admin

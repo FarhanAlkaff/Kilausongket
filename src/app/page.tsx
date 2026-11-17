@@ -213,7 +213,10 @@ export default function Home() {
       <Testimonials testimonials={testimonials} />
 
       {/* About Kilau Songket */}
-      <AboutSection aboutText={storeSettings?.aboutText} />
+      <AboutSection
+        aboutText={storeSettings?.aboutText}
+        aboutVideoUrl={storeSettings?.aboutVideoUrl}
+      />
 
       {/* Frequently Asked Questions */}
       <FAQSection faqs={faqs} />

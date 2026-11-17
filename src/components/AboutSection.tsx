@@ -1,40 +1,64 @@
 "use client";
 
 import React from "react";
-import Image from "next/image";
-import { Sparkles, Heart, Award, Shield } from "lucide-react";
+import { Sparkles, Heart, Award, Shield, Play, ExternalLink } from "lucide-react";
 import BrandLogo from "./BrandLogo";
 import { FadeInLeft, FadeInRight, FadeIn } from "@/components/ui/motion-wrapper";
+import { useStoreSettings } from "@/context/StoreSettingsContext";
 
 interface AboutSectionProps {
   aboutText?: string;
+  aboutVideoUrl?: string;
 }
 
-export const AboutSection: React.FC<AboutSectionProps> = ({ aboutText }) => {
+export function getYouTubeEmbedInfo(url?: string): { embedUrl: string; videoId: string; watchUrl: string } {
+  const fallbackId = "3g8K1oWq0eE";
+  if (!url) {
+    return {
+      videoId: fallbackId,
+      embedUrl: `https://www.youtube-nocookie.com/embed/${fallbackId}?rel=0&modestbranding=1&playsinline=1`,
+      watchUrl: `https://www.youtube.com/watch?v=${fallbackId}`,
+    };
+  }
+  const regExp = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=|shorts\/))([\w-]{11})/;
+  const match = url.match(regExp);
+  const videoId = match && match[1] ? match[1] : fallbackId;
+  return {
+    videoId,
+    embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1`,
+    watchUrl: `https://www.youtube.com/watch?v=${videoId}`,
+  };
+}
+
+export const AboutSection: React.FC<AboutSectionProps> = ({ aboutText, aboutVideoUrl }) => {
+  const { settings } = useStoreSettings();
+  const currentVideo = aboutVideoUrl || settings.aboutVideoUrl || "https://www.youtube.com/watch?v=3g8K1oWq0eE";
+  const videoInfo = getYouTubeEmbedInfo(currentVideo);
+
   return (
     <section id="tentang" className="py-16 sm:py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           
-          {/* Left Column: Visual Story Image with FadeInLeft */}
+          {/* Left Column: Visual Story Video with FadeInLeft */}
           <FadeInLeft className="lg:col-span-5 relative">
-            <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-ivory aspect-[4/5] bg-stone-100">
-              <Image
-                src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80"
-                alt="Proses Pengerjaan dan Filosofi Kilau Songket"
-                fill
-                className="object-cover"
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-ivory aspect-[4/5] bg-stone-950 group">
+              {/* YouTube Video Player Embed */}
+              <iframe
+                src={videoInfo.embedUrl}
+                title="Filosofi Kilau Songket - Tenun Tradisional Palembang"
+                className="w-full h-full border-0 rounded-2xl"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-forest-dark/90 via-forest-dark/20 to-transparent" />
-              
-              <div className="absolute bottom-6 left-6 right-6 text-white">
-                <span className="text-xs uppercase font-semibold text-gold-light tracking-widest block mb-1">
-                  Filosofi Kilau Songket
+
+              {/* YouTube Top Badge */}
+              <div className="absolute top-3 left-3 pointer-events-none">
+                <span className="px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-md text-[10px] font-bold text-white flex items-center gap-1.5 border border-white/10 shadow-lg">
+                  <Play className="w-3 h-3 text-red-500 fill-current" />
+                  <span>Video Dokumenter YouTube</span>
                 </span>
-                <h3 className="font-serif text-xl font-bold text-ivory">
-                  Menjaga Martabat Tradisi dalam Setiap Rajutan Benang Emas
-                </h3>
               </div>
             </div>
 

@@ -44,6 +44,7 @@ export async function GET() {
         heroTitle: settings.hero_title,
         heroSubtitle: settings.hero_subtitle,
         heroHighlightWord: settings.hero_highlight_word || "Songket",
+        aboutVideoUrl: settings.about_video_url || "https://www.youtube.com/watch?v=3g8K1oWq0eE",
         aboutText: settings.about_text,
       },
     });
@@ -77,6 +78,7 @@ export async function PUT(req: NextRequest) {
       heroTitle,
       heroSubtitle,
       heroHighlightWord,
+      aboutVideoUrl,
       aboutText,
     } = body;
 
@@ -87,9 +89,9 @@ export async function PUT(req: NextRequest) {
         `INSERT INTO store_settings (
           id, name, tagline, whatsapp_number, whatsapp_display, shopee_url,
           instagram_url, tiktok_url, email, operational_hours, address,
-          promo_title, promo_subtitle, hero_title, hero_subtitle, hero_highlight_word, about_text
+          promo_title, promo_subtitle, hero_title, hero_subtitle, hero_highlight_word, about_video_url, about_text
         ) VALUES (
-          'main', $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16
+          'main', $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
         )
         ON CONFLICT(id) DO UPDATE SET
           name = COALESCE(EXCLUDED.name, store_settings.name),
@@ -107,6 +109,7 @@ export async function PUT(req: NextRequest) {
           hero_title = COALESCE(EXCLUDED.hero_title, store_settings.hero_title),
           hero_subtitle = COALESCE(EXCLUDED.hero_subtitle, store_settings.hero_subtitle),
           hero_highlight_word = COALESCE(EXCLUDED.hero_highlight_word, store_settings.hero_highlight_word),
+          about_video_url = COALESCE(EXCLUDED.about_video_url, store_settings.about_video_url),
           about_text = COALESCE(EXCLUDED.about_text, store_settings.about_text)`,
         [
           name,
@@ -124,6 +127,7 @@ export async function PUT(req: NextRequest) {
           heroTitle,
           heroSubtitle,
           heroHighlightWord || "Songket",
+          aboutVideoUrl || "https://www.youtube.com/watch?v=3g8K1oWq0eE",
           aboutText,
         ]
       );
@@ -134,9 +138,9 @@ export async function PUT(req: NextRequest) {
         INSERT INTO store_settings (
           id, name, tagline, whatsapp_number, whatsapp_display, shopee_url,
           instagram_url, tiktok_url, email, operational_hours, address,
-          promo_title, promo_subtitle, hero_title, hero_subtitle, hero_highlight_word, about_text
+          promo_title, promo_subtitle, hero_title, hero_subtitle, hero_highlight_word, about_video_url, about_text
         ) VALUES (
-          'main', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+          'main', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
         )
         ON CONFLICT(id) DO UPDATE SET
           name = COALESCE(excluded.name, store_settings.name),
@@ -154,6 +158,7 @@ export async function PUT(req: NextRequest) {
           hero_title = COALESCE(excluded.hero_title, store_settings.hero_title),
           hero_subtitle = COALESCE(excluded.hero_subtitle, store_settings.hero_subtitle),
           hero_highlight_word = COALESCE(excluded.hero_highlight_word, store_settings.hero_highlight_word),
+          about_video_url = COALESCE(excluded.about_video_url, store_settings.about_video_url),
           about_text = COALESCE(excluded.about_text, store_settings.about_text)
       `).run(
         name,
@@ -171,6 +176,7 @@ export async function PUT(req: NextRequest) {
         heroTitle,
         heroSubtitle,
         heroHighlightWord || "Songket",
+        aboutVideoUrl || "https://www.youtube.com/watch?v=3g8K1oWq0eE",
         aboutText
       );
     }

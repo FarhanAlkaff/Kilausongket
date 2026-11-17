@@ -17,11 +17,13 @@ import {
   User,
   ShieldCheck,
   Database as DatabaseIcon,
-  RefreshCw
+  RefreshCw,
+  Play
 } from "lucide-react";
 import { useStoreSettings } from "@/context/StoreSettingsContext";
 import ShopeeIcon from "@/components/ShopeeIcon";
 import { renderFormattedHeroTitle } from "@/components/Hero";
+import { getYouTubeEmbedInfo } from "@/components/AboutSection";
 
 export default function AdminSettingsPage() {
   const { refreshSettings } = useStoreSettings();
@@ -46,6 +48,7 @@ export default function AdminSettingsPage() {
     heroHighlightWord: "Songket",
     promoTitle: "Promo Spesial Hari Kartini & Hari Raya 2026",
     promoSubtitle: "Dapatkan Gratis Tanjak Cilik / Selendang Senada untuk setiap pembelian paket Songket Anak & Sarimbit Keluarga.",
+    aboutVideoUrl: "https://www.youtube.com/watch?v=3g8K1oWq0eE",
     aboutText: "",
   });
 
@@ -495,6 +498,41 @@ export default function AdminSettingsPage() {
                 placeholder="Sentra Tenun & Butik Kilau Songket, Jl. Kebangsaan No. 88, Indonesia"
                 className="w-full px-3.5 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest"
               />
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block font-semibold text-stone-700 mb-1">
+                Link Video YouTube (Tentang Kami / Filosofi Toko)
+              </label>
+              <input
+                type="url"
+                name="aboutVideoUrl"
+                value={form.aboutVideoUrl || ""}
+                onChange={handleChange}
+                placeholder="https://www.youtube.com/watch?v=... atau https://youtu.be/..."
+                className="w-full px-3.5 py-2 border border-stone-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-forest/20 focus:border-forest"
+              />
+              <span className="text-[10px] text-stone-400 mt-1 block">
+                Video YouTube ini menggantikan foto statis di section &ldquo;Tentang Kilau Songket&rdquo; pada halaman depan website.
+              </span>
+
+              {form.aboutVideoUrl && (
+                <div className="mt-3 p-3 bg-stone-50 border border-stone-200 rounded-xl">
+                  <div className="text-[11px] font-semibold text-stone-600 mb-1.5 flex items-center gap-1.5">
+                    <Play className="w-3.5 h-3.5 text-red-600 fill-current" />
+                    <span>Preview Video YouTube di Website:</span>
+                  </div>
+                  <div className="aspect-video max-w-sm rounded-lg overflow-hidden border border-stone-200 bg-black">
+                    <iframe
+                      src={getYouTubeEmbedInfo(form.aboutVideoUrl).embedUrl}
+                      title="Preview Video"
+                      className="w-full h-full border-0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="sm:col-span-2">
